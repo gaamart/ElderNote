@@ -1,0 +1,80 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.applications.guilhermeaugusto.eldernote.Activities.MainActivity"
+    android:background="#fff2f2f5">
+
+    <LinearLayout
+        android:id="@+id/controlsLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#fff2f2f5"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/createNewAnnotation"
+            android:id="@+id/createNewAnnotationButton"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:background="@drawable/big_button"
+            android:onClick="createNewAnnotationButtonOnClick"
+            android:layout_gravity="center"/>
+        <LinearLayout
+            android:id="@+id/searchLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/activity_vertical_margin">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:background="@android:drawable/ic_menu_search"
+                android:layout_gravity="center"
+                android:contentDescription="@string/iconSearchAccessibilityText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:textSize="24sp"
+                android:id="@+id/searchTextView"
+                android:text="@string/searchTextViewText"
+                android:layout_gravity="center_vertical"/>
+
+            <Spinner
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/annotationsFilterSpinner"
+                android:textSize="22sp"/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/annotationsListLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/controlsLayout">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="40dip"
+            android:gravity="center_vertical|center_horizontal"
+            android:textSize="24sp"
+            android:background="#ffdeddde"
+            android:id="@+id/annotationsListTextView"
+            android:text="@string/annotationsListTextViewText"
+            android:textStyle="bold" />
+
+        <ListView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/annotationsListView"/>
+    </LinearLayout>
+</RelativeLayout>

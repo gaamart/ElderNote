@@ -40,6 +40,7 @@ import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Activities;
 import com.applications.guilhermeaugusto.eldernote.beans.Alarms;
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
+import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -48,10 +49,7 @@ import java.util.Random;
 public class AnnotationActivity extends FragmentActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,
     TextDialogFragment.TextDialogFragmentListener, AudioDialogFragment.SoundDialogFragmentListener, AlarmRingtoneFragment.AlarmRingToneFragmentListener{
 
-    private enum OperationType { Create, Update }
-    private enum AlarmTypes { Blank, New, Created }
-    private enum ContentTypes { Blank, EditingText, RecordingSound, PlayingSound, ShowingText, ShowingSound }
-    private enum DeleteTypes {Annotation, Alarm }
+
 
 //region Variables
     public Annotations currentAnnotation;
@@ -63,9 +61,9 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     private DataBaseHandler dataBaseHandler;
     private InputMethodManager inputMethodManager;
     private DialogFragment dialogFragment;
-    private ContentTypes contentType;
-    private OperationType operationType;
-    private AlarmTypes alarmType;
+    private Enums.ContentTypes contentType;
+    private Enums.OperationType operationType;
+    private Enums.AlarmTypes alarmType;
 
     private SeekBar seekBar;
     private RelativeLayout writeTextLayout;
@@ -75,7 +73,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     private ImageButton deleteAlarmButton;
     private TextView alarmDatetextView;
     private ImageButton refreshContentButton;
-    private ImageButton deleteAnnotationButton;
     private TextView createAnnotationTextView;
     private TextView annotationTextView;
     private Spinner spinner;
@@ -99,8 +96,8 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     protected void onPause() {
         super.onPause();
         pauseSoundIfNeeded();
-        if (contentType == ContentTypes.RecordingSound) { dialogFragment.getDialog().dismiss(); }
-        if (contentType == ContentTypes.EditingText) { dialogFragment.getDialog().dismiss(); }
+        if (contentType == Enums.ContentTypes.RecordingSound) { dialogFragment.getDialog().dismiss(); }
+        if (contentType == Enums.ContentTypes.EditingText) { dialogFragment.getDialog().dismiss(); }
         if (currentAlarm.getPlayRingtone()){ dialogFragment.getDialog().dismiss(); }
     }
 
@@ -132,7 +129,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         createAlarmButton = (Button) findViewById(R.id.createAlarmButton);
         deleteAlarmButton = (ImageButton) findViewById(R.id.deleteAlarmButton);
         createAnnotationTextView = (TextView) findViewById(R.id.createAnnotationTextView);
-        deleteAnnotationButton = (ImageButton) findViewById(R.id.deleteAnnotationButton);
         alarmDatetextView = (TextView) findViewById(R.id.alarmDatetextView);
     }
 //endregion
@@ -161,6 +157,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
 
     private void prepareToPlayingSound() {
         mediaPlayer = new MediaPlayer();
+
         try {
             mediaPlayer.setDataSource(currentAnnotation.getSound());
             mediaPlayer.prepare();
@@ -172,7 +169,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             @Override
             public void onCompletion(MediaPlayer mp) {
                 startPlaying = false;
-                contentType = ContentTypes.ShowingSound;
+                contentType = Enums.ContentTypes.ShowingSound;
                 rulesForShowComponents();
                 mediaPlayer.seekTo(0);
             }
@@ -186,43 +183,41 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         prepareSpinner();
         if(currentAnnotation.getId() >= 0) {
             spinner.setSelection(currentAnnotation.getAtivity().getId() - 1);
-            operationType = OperationType.Update;
-        } else { operationType = OperationType.Create; }
+            operationType = Enums.OperationType.Update;
+        } else { operationType = Enums.OperationType.Create; }
 
         if(currentAnnotation.getMessage() != null && !currentAnnotation.getMessage().isEmpty()){
-            contentType = ContentTypes.ShowingText;
+            contentType = Enums.ContentTypes.ShowingText;
             annotationTextView.setText(currentAnnotation.getMessage());
         }
         else if(currentAnnotation.getSound() != null && !currentAnnotation.getSound().isEmpty()){
-            contentType = ContentTypes.ShowingSound;
+            contentType = Enums.ContentTypes.ShowingSound;
             prepareToPlayingSound();
             prepareSeekBar();
         }
-        else { contentType = ContentTypes.Blank; }
+        else { contentType = Enums.ContentTypes.Blank; }
 
         currentAlarm.setId(currentAnnotation.getAlarm().getId());
         currentAlarm.setDateInMillis(currentAnnotation.getAlarm().getDateInMillis());
         currentAlarm.setPlayRingnote(currentAnnotation.getAlarm().getPlayRingtone());
         if(currentAlarm.getId() > 0) {
-            alarmType = AlarmTypes.Created;
+            alarmType = Enums.AlarmTypes.Created;
             if(currentAlarm.getPlayRingtone()){
                 dialogFragment = new AlarmRingtoneFragment();
                 dialogFragment.show(getSupportFragmentManager(), "alarmRingtone");
             }
         }
-        else { alarmType = AlarmTypes.Blank; }
+        else { alarmType = Enums.AlarmTypes.Blank; }
     }
 
     private void rulesForShowOperation(){
         switch (operationType){
             case Create: {
                 createAnnotationTextView.setText(getResources().getString(R.string.createAnnotationTextView));
-                deleteAnnotationButton.setVisibility(View.INVISIBLE);
                 break;
             }
             case Update: {
                 createAnnotationTextView.setText(getResources().getString(R.string.updateAnnotationTextView));
-                deleteAnnotationButton.setVisibility(View.VISIBLE);
                 break;
             }
             default: break;
@@ -302,7 +297,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.soundRecordLayout: {
-                contentType = ContentTypes.RecordingSound;
+                contentType = Enums.ContentTypes.RecordingSound;
                 dialogFragment = new AudioDialogFragment();
                 dialogFragment.show(getSupportFragmentManager(), "audio");
                 break;
@@ -311,16 +306,17 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 startPlaying = !startPlaying;
                 if (startPlaying) {
                     mediaPlayer.start();
-                    contentType = ContentTypes.PlayingSound;
+                    contentType = Enums.ContentTypes.PlayingSound;
                 } else {
                     mediaPlayer.pause();
-                    contentType = ContentTypes.ShowingSound;
+                    contentType = Enums.ContentTypes.ShowingSound;
                 }
                 rulesForShowComponents();
                 break;
             }
             case R.id.refreshContentButton: {
-                if(contentType == ContentTypes.ShowingSound) {
+                if(contentType == Enums.ContentTypes.ShowingSound) {
+                    contentType = Enums.ContentTypes.RecordingSound;
                     dialogFragment = new AudioDialogFragment();
                     dialogFragment.show(getSupportFragmentManager(), "audio");
                 } else {
@@ -335,7 +331,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             }
             case R.id.createAlarmButton: {
                 Bundle b = new Bundle();
-                if(alarmType != AlarmTypes.Blank) {
+                if(alarmType != Enums.AlarmTypes.Blank) {
                     currentAlarm.createDateConponentesByTimeInMillis();
                     b.putInt(DatePickerFragment.YEAR, currentAlarm.getYear());
                     b.putInt(DatePickerFragment.MONTH, currentAlarm.getMonth());
@@ -354,23 +350,23 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             case R.id.deleteAlarmButton:{
                 callDeleteDialog(getResources().getString(R.string.deleteAlarmTitleDialogText),
                         getResources().getString(R.string.deleteAlarmMessageDialogText),
-                        DeleteTypes.Alarm);
+                        Enums.DeleteTypes.Alarm);
                 break;
             }
 
             case R.id.saveButton: {
-                if(contentType != ContentTypes.Blank){
+                if(contentType != Enums.ContentTypes.Blank){
                     pauseSoundIfNeeded();
                     Activities activity = (Activities) ( (Spinner) findViewById(R.id.activitiesSpinner) ).getSelectedItem();
                     currentAnnotation.setMessage(annotationTextView.getText().toString());
                     currentAnnotation.setActivity(activity);
                     currentAnnotation.setAlarm(currentAlarm);
 
-                    if(alarmType == AlarmTypes.New){
+                    if(alarmType == Enums.AlarmTypes.New){
                         AlarmEntity.createAlarm(getApplicationContext(), currentAnnotation);
                     }
 
-                    if(operationType == OperationType.Create){ dataBaseHandler.insertAnnotation(currentAnnotation); }
+                    if(operationType == Enums.OperationType.Create){ dataBaseHandler.insertAnnotation(currentAnnotation); }
                     else { dataBaseHandler.updateAnnotation(currentAnnotation); }
 
                     Toast.makeText(this, getResources().getString(R.string.saveSuccessAnnotationToastText), Toast.LENGTH_LONG).show();
@@ -390,7 +386,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 pauseSoundIfNeeded();
                 callDeleteDialog(getResources().getString(R.string.deleteAnnotationTitleDialogText),
                         getResources().getString(R.string.deleteAnnotationMessageDialogText),
-                        DeleteTypes.Annotation);
+                        Enums.DeleteTypes.Annotation);
                 break;
             }
 
@@ -406,7 +402,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         currentAlarm.setDay(day);
 
         Bundle b = new Bundle();
-        if(alarmType != AlarmTypes.Blank) {
+        if(alarmType != Enums.AlarmTypes.Blank) {
             b.putInt(TimePickerFragment.HOUR, currentAlarm.getHour());
             b.putInt(TimePickerFragment.MINUTE, currentAlarm.getMinute());
         } else {
@@ -425,7 +421,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         currentAlarm.setMinute(minute);
         currentAlarm.createTimeInMillis();
         currentAlarm.setId(randInt());
-        alarmType = AlarmTypes.New;
+        alarmType = Enums.AlarmTypes.New;
         rulesForShowAlarm();
     }
 
@@ -434,7 +430,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         if(editText.getText().toString() != null && !editText.getText().toString().isEmpty()) {
             currentAnnotation.setMessage(editText.getText().toString());
             annotationTextView.setText(editText.getText().toString());
-            contentType = ContentTypes.ShowingText;
+            contentType = Enums.ContentTypes.ShowingText;
             rulesForShowComponents();
         } else {
             returnTextToLastState();
@@ -451,13 +447,13 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     public void onSoundDialogPositiveClick(String soundCreated){
         deleteOldSoundContent();
         currentAnnotation.setSound(soundCreated);
-        contentType = ContentTypes.ShowingSound;
+        contentType = Enums.ContentTypes.ShowingSound;
         prepareToPlayingSound();
         prepareSeekBar();
         rulesForShowComponents();
     }
 
-    public void onSoundDialogNegativeClick(){ }
+    public void onSoundDialogNegativeClick(){ returnSoundToLastState(); }
 
     public void onAlarmRingtoneDialogClick(){
         currentAlarm.setPlayRingnote(false);
@@ -486,10 +482,16 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         }
     }
 
+    private void returnSoundToLastState(){
+        if(currentAnnotation.getSound() == null || currentAnnotation.getSound().isEmpty()){ contentType = Enums.ContentTypes.Blank; }
+        else { contentType = Enums.ContentTypes.ShowingSound; }
+        rulesForShowComponents();
+    }
+
     private void returnTextToLastState(){
-        if(currentAnnotation.getMessage() == null || currentAnnotation.getMessage().isEmpty()){ contentType = ContentTypes.Blank; }
+        if(currentAnnotation.getMessage() == null || currentAnnotation.getMessage().isEmpty()){ contentType = Enums.ContentTypes.Blank; }
         else {
-            contentType = ContentTypes.ShowingText;
+            contentType = Enums.ContentTypes.ShowingText;
             annotationTextView.setText(currentAnnotation.getMessage());
         }
         rulesForShowComponents();
@@ -503,16 +505,16 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     }
 
     private void pauseSoundIfNeeded(){
-        if (contentType == ContentTypes.PlayingSound) {
+        if (contentType == Enums.ContentTypes.PlayingSound) {
         startPlaying = !startPlaying;
         mediaPlayer.pause();
-        contentType = ContentTypes.ShowingSound;
+        contentType = Enums.ContentTypes.ShowingSound;
         rulesForShowComponents();
         }
     }
 
     private void callTextFragmentDialog(){
-        contentType = ContentTypes.EditingText;
+        contentType = Enums.ContentTypes.EditingText;
         Bundle b = new Bundle();
         b.putString(TextDialogFragment.TEXT, currentAnnotation.getMessage());
         dialogFragment = new TextDialogFragment();
@@ -520,7 +522,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         dialogFragment.show(getSupportFragmentManager(), "text");
     }
 
-    private void callDeleteDialog(String title, String message, final DeleteTypes deleteType){
+    private void callDeleteDialog(String title, String message, final Enums.DeleteTypes deleteType){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AnnotationActivity.this);
         alertDialogBuilder.setMessage(message)
                 .setTitle(title)
@@ -554,8 +556,8 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
 
 //region deleteMethods
     private void deleteAnnotation(){
-        if(contentType == ContentTypes.ShowingSound) { SoundFiles.removeOutputFile(currentAnnotation.getSound()); }
-        if(alarmType == AlarmTypes.Created) {
+        if(contentType == Enums.ContentTypes.ShowingSound) { SoundFiles.removeOutputFile(currentAnnotation.getSound()); }
+        if(alarmType == Enums.AlarmTypes.Created) {
             AlarmEntity.removeAlarm(getApplicationContext(), currentAlarm.getId());
             currentAlarm.setId(-1);
             currentAlarm.setDateInMillis(null);
@@ -566,7 +568,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     }
 
     private void deleteAlarm(){
-        alarmType = AlarmTypes.Blank;
+        alarmType = Enums.AlarmTypes.Blank;
         rulesForShowAlarm();
         AlarmEntity.removeAlarm(getApplicationContext(), currentAlarm.getId());
         currentAlarm.setId(-1);

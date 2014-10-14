@@ -31,17 +31,6 @@
                     android:textSize="22sp"
                     android:background="#ffdeddde"
                     android:text="@string/createAnnotationTextView" />
-
-                <ImageButton
-                    android:id="@+id/deleteAnnotationButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:onClick="onClick"
-                    android:visibility="invisible"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:background="@android:drawable/ic_menu_delete"
-                    android:contentDescription="@string/deleteAnnotationAccessibilityText"/>
             </RelativeLayout>
 
             <TextView
@@ -223,10 +212,10 @@
         android:paddingTop="@dimen/activity_vertical_margin">
 
         <Button
-            android:id="@+id/saveButton"
+            android:id="@+id/cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/saveButtonText"
+            android:text="@string/cancelText"
             android:textStyle="bold"
             android:textSize="22sp"
             android:onClick="onClick"
@@ -235,10 +224,10 @@
             android:background="@drawable/small_button" />
 
         <Button
-            android:id="@+id/cancelButton"
+            android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cancelText"
+            android:text="@string/saveButtonText"
             android:textStyle="bold"
             android:textSize="22sp"
             android:onClick="onClick"

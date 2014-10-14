@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.applications.guilhermeaugusto.eldernote.R;
@@ -65,6 +66,7 @@ public class TextDialogFragment extends DialogFragment {
                 });
         Dialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         return dialog;
     }
 

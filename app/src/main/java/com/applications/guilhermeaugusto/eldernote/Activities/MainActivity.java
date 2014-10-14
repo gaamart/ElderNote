@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.applications.guilhermeaugusto.eldernote.Managers.DataBaseHandler;
 import com.applications.guilhermeaugusto.eldernote.Extended.ExtendedArrayAdapter;
@@ -22,20 +23,27 @@ import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ExtendedArrayAdapter.ExtendedArrayAdapterListener {
 
     private DataBaseHandler dataBaseHandler;
     private ListView listView;
+    private TextView emptyAnnotationsListView;
     private ExtendedArrayAdapter dataAdapter;
     private static final String LOG_TAG = "ElderNoteLog";
     private  List<Annotations> annotationsList = new ArrayList<Annotations>();
+    private Activities currentActivity;
+
+    private void init(){
+        listView = (ListView) findViewById(R.id.annotationsListView);
+        emptyAnnotationsListView = (TextView) findViewById(R.id.emptyAnnotationsListView);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         dataBaseHandler = new DataBaseHandler(getApplicationContext());
-        listView = (ListView) findViewById(R.id.annotationsListView);
+        init();
         prepareSpinner();
         prepareListView();
         SoundFiles.removeNotUsedSoundFiles(annotationsList);
@@ -58,6 +66,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void prepareListView(){
         dataAdapter = new ExtendedArrayAdapter(this, new ArrayList<Annotations>());
+        dataAdapter.setTheListener(this);
         listView.setAdapter(dataAdapter);
         listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
             @Override
@@ -68,7 +77,8 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(intent);
             }
         });
-        populateListViewByActivity(null);
+        currentActivity = null;
+        populateListViewByActivity();
     }
 
     public void createNewAnnotationButtonOnClick(View v) {
@@ -90,8 +100,9 @@ public class MainActivity extends ActionBarActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if(position == 0) populateListViewByActivity(null);
-                else populateListViewByActivity((Activities) parentView.getItemAtPosition(position));
+                if(position == 0) currentActivity = null;
+                else currentActivity = (Activities) parentView.getItemAtPosition(position);
+                populateListViewByActivity();
             }
 
             @Override
@@ -99,11 +110,20 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    private void populateListViewByActivity(Activities activity){
+    private void populateListViewByActivity(){
         dataAdapter.clear();
-        if(activity == null){ annotationsList = dataBaseHandler.selectAllAnnotations(); }
-        else { annotationsList = dataBaseHandler.selectAnnotationsByActivity(activity); }
-        for(int i = 0; i < annotationsList.size(); i++){ dataAdapter.add(annotationsList.get(i)); }
+        if(currentActivity == null){ annotationsList = dataBaseHandler.selectAllAnnotations(); }
+        else { annotationsList = dataBaseHandler.selectAnnotationsByActivity(currentActivity); }
+        if(!annotationsList.isEmpty()) {
+            for (int i = 0; i < annotationsList.size(); i++) {
+                dataAdapter.add(annotationsList.get(i));
+            }
+            emptyAnnotationsListView.setVisibility(View.INVISIBLE);
+        } else { emptyAnnotationsListView.setVisibility(View.VISIBLE); }
         dataAdapter.notifyDataSetChanged();
+    }
+
+    public void onDeleteClick(){
+        populateListViewByActivity();
     }
 }

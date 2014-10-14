@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <EditText
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/dialog_content"
+        android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/dialogAnnotationEditText"
-        android:inputType="textMultiLine"
-        android:lines="8"
-        android:gravity="top|start"
-        android:background="#00000000"
-        android:textSize="18sp"
-        android:scrollbars="vertical"
-        android:fadeScrollbars="false"/>
-</LinearLayout>
+        android:layout_height="fill_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true"
+        android:minHeight="1000dp">
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/dialogAnnotationEditText"
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:background="#00000000"
+            android:textSize="18sp"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="false"/>
+    </ScrollView>
+    </LinearLayout>

@@ -17,7 +17,7 @@
     <string name="annotationTextView">Anotação:</string>
     <string name="createNewAnnotation">Criar nova anotação</string>
     <string name="saveButtonText">Salvar</string>
-    <string name="alarmButtonText">Criar lembrete</string>
+    <string name="alarmButtonText">Quer criar lembrete?</string>
     <string name="cancelText">Cancelar</string>
     <string name="deleteAnnotationButtonText">Deletar</string>
     <string name="updateAnnotationButtonText">Atualizar</string>
@@ -55,4 +55,5 @@
     <string name="emptyTextErroMessageDialogText">Não é possível inserir um texto em branco, por favor tente novamente</string>
     <string name="emptyContentErroTitleDialogText">Anotação sem conteúdo</string>
     <string name="emptyContentErroMessageDialogText">Não é possível salvar uma anotação sem conteúdo, por favor tente novamente</string>
+    <string name="emptyListViewText">Não há anotações</string>
 </resources>

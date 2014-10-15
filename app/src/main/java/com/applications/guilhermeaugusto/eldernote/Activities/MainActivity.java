@@ -1,5 +1,7 @@
 package com.applications.guilhermeaugusto.eldernote.Activities;
 
+import android.widget.RelativeLayout;
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -47,6 +49,7 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
         prepareSpinner();
         prepareListView();
         SoundFiles.removeNotUsedSoundFiles(annotationsList);
+        showOverLay();
     }
 
     @Override
@@ -125,5 +128,20 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
 
     public void onDeleteClick(){
         populateListViewByActivity();
+    }
+
+    private void showOverLay(){
+        final Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent_NoTitleBar);
+        dialog.setContentView(R.layout.activity_main_help);
+        RelativeLayout layout = (RelativeLayout) dialog.findViewById(R.id.main_help_view);
+        layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
     }
 }

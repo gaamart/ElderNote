@@ -1,17 +1,21 @@
 package com.applications.guilhermeaugusto.eldernote.Dialogs;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.applications.guilhermeaugusto.eldernote.R;
 
@@ -42,6 +46,7 @@ public class AlarmRingtoneFragment  extends DialogFragment {
     public Dialog onCreateDialog(Bundle saveInstanceState) {
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.dialog_alarm, null);
+        createAlarmAnnimation(view);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getResources().getString(R.string.deleteAlarmTitleDialogText));
         builder.setView(view)
@@ -82,5 +87,17 @@ public class AlarmRingtoneFragment  extends DialogFragment {
         } catch (Exception e) {
             Log.e(LOG_TAG, "prepare() failed");
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    public void createAlarmAnnimation(View rootView) {
+        ImageView alarmImageView = (ImageView) rootView.findViewById(R.id.alarmImageView);
+        AnimationDrawable flyAnimationDrawable = new AnimationDrawable();
+        flyAnimationDrawable.addFrame(getResources().getDrawable(R.drawable.first), 200);
+        flyAnimationDrawable.addFrame(getResources().getDrawable(R.drawable.second), 200);
+        flyAnimationDrawable.addFrame(getResources().getDrawable(R.drawable.third), 200);
+        flyAnimationDrawable.setOneShot(false);
+        alarmImageView.setBackground(flyAnimationDrawable);
+        flyAnimationDrawable.start();
     }
 }

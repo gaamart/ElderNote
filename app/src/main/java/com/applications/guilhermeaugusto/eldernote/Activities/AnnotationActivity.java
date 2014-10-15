@@ -207,7 +207,10 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 dialogFragment.show(getSupportFragmentManager(), "alarmRingtone");
             }
         }
-        else { alarmType = Enums.AlarmTypes.Blank; }
+        else {
+            if (contentType == Enums.ContentTypes.Blank){ alarmType = Enums.AlarmTypes.Hidden; }
+            else alarmType = Enums.AlarmTypes.Selectable;
+        }
     }
 
     private void rulesForShowOperation(){
@@ -226,7 +229,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
 
     private void rulesForShowAlarm(){
         switch (alarmType){
-            case Blank: {
+            case Selectable: {
                 createAlarmButton.setVisibility(View.VISIBLE);
                 deleteAlarmButton.setVisibility(View.INVISIBLE);
                 alarmDatetextView.setVisibility(View.INVISIBLE);
@@ -246,6 +249,11 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 alarmDatetextView.setText(getResources().getString(R.string.createAlarmDateText) + currentAlarm.createDateLayout());
                 alarmDatetextView.setVisibility(View.VISIBLE);
                 break;
+            }
+            case Hidden:{
+                createAlarmButton.setVisibility(View.INVISIBLE);
+                deleteAlarmButton.setVisibility(View.INVISIBLE);
+                alarmDatetextView.setVisibility(View.INVISIBLE);
             }
             default: break;
         }
@@ -331,7 +339,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             }
             case R.id.createAlarmButton: {
                 Bundle b = new Bundle();
-                if(alarmType != Enums.AlarmTypes.Blank) {
+                if(alarmType != Enums.AlarmTypes.Selectable) {
                     currentAlarm.createDateConponentesByTimeInMillis();
                     b.putInt(DatePickerFragment.YEAR, currentAlarm.getYear());
                     b.putInt(DatePickerFragment.MONTH, currentAlarm.getMonth());
@@ -402,7 +410,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         currentAlarm.setDay(day);
 
         Bundle b = new Bundle();
-        if(alarmType != Enums.AlarmTypes.Blank) {
+        if(alarmType != Enums.AlarmTypes.Selectable) {
             b.putInt(TimePickerFragment.HOUR, currentAlarm.getHour());
             b.putInt(TimePickerFragment.MINUTE, currentAlarm.getMinute());
         } else {
@@ -437,6 +445,10 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             callErroDialog(getResources().getString(R.string.emptyTextErroTitleDialogText),
                     getResources().getString(R.string.emptyTextErroMessageDialogText));
         }
+        if(alarmType == Enums.AlarmTypes.Hidden) {
+            alarmType = Enums.AlarmTypes.Selectable;
+            rulesForShowAlarm();
+        }
     }
 
     public void onTextDialogNegativeClick(EditText editText){
@@ -451,6 +463,11 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         prepareToPlayingSound();
         prepareSeekBar();
         rulesForShowComponents();
+
+        if(alarmType == Enums.AlarmTypes.Hidden) {
+            alarmType = Enums.AlarmTypes.Selectable;
+            rulesForShowAlarm();
+        }
     }
 
     public void onSoundDialogNegativeClick(){ returnSoundToLastState(); }
@@ -568,7 +585,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     }
 
     private void deleteAlarm(){
-        alarmType = Enums.AlarmTypes.Blank;
+        alarmType = Enums.AlarmTypes.Selectable;
         rulesForShowAlarm();
         AlarmEntity.removeAlarm(getApplicationContext(), currentAlarm.getId());
         currentAlarm.setId(-1);

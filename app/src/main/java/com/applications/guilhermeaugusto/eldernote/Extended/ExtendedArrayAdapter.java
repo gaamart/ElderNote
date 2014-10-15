@@ -73,7 +73,8 @@ public class ExtendedArrayAdapter extends ArrayAdapter<Annotations> {
 
     public void defineAlarmContent(View view,  int position){
         TextView alarmContentTextView = (TextView) view.findViewById(R.id.alarmContentTextView);
-        if(itemsArrayList.get(position).getAlarm().createDateLayout() != null && !itemsArrayList.get(position).getMessage().isEmpty()){
+        if(itemsArrayList.get(position).getAlarm().createDateLayout() != null &&
+                !itemsArrayList.get(position).getAlarm().createDateLayout().isEmpty()){
             alarmContentTextView.setText(getContext().getResources().getString(R.string.createAlarmDateText) +
                     itemsArrayList.get(position).getAlarm().createDateLayout());
         }

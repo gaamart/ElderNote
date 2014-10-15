@@ -5,7 +5,7 @@ package com.applications.guilhermeaugusto.eldernote.beans;
  */
 public abstract class Enums {
     public enum OperationType { Create, Update }
-    public enum AlarmTypes { Blank, New, Created }
+    public enum AlarmTypes { Selectable, New, Created, Hidden }
     public enum ContentTypes { Blank, EditingText, RecordingSound, PlayingSound, ShowingText, ShowingSound }
     public enum DeleteTypes {Annotation, Alarm }
 }

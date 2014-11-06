@@ -20,27 +20,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/createAnnotationTextView"
-                    android:layout_width="fill_parent"
-                    android:layout_height="48dp"
-                    android:gravity="center_vertical"
-                    android:textSize="22sp"
-                    android:background="#ffdeddde"
-                    android:text="@string/createAnnotationTextView" />
-            </RelativeLayout>
-
             <TextView
                 android:id="@+id/titleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/titleTextView"
                 android:textSize="22sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dip" />
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/activitiesSpinner"
@@ -52,7 +38,7 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp">
+            android:layout_marginTop="12dp">
             <TextView
                 android:id="@+id/annotationTitleTextView"
                 android:layout_width="wrap_content"
@@ -182,11 +168,29 @@
             android:background="@drawable/big_button"
             android:layout_centerHorizontal="true"/>
 
-        <TextView android:id="@+id/alarmDatetextView"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="22sp"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/alarmTitleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/alarmTitleTextView"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView android:id="@+id/alarmCycleDescriptionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"/>
+
+            <TextView android:id="@+id/alarmDateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"/>
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/deleteAlarmButton"
@@ -221,6 +225,17 @@
             android:onClick="onClick"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:background="@drawable/red_small_button" />
+
+        <Button
+            android:id="@+id/okButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/doneText"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:onClick="onClick"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/small_button" />
 
         <Button
@@ -233,6 +248,6 @@
             android:onClick="onClick"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/small_button" />
+            android:background="@drawable/green_small_button" />
     </RelativeLayout>
 </RelativeLayout>

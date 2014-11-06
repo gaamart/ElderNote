@@ -8,14 +8,20 @@ import java.io.Serializable;
  */
 public class Annotations implements Serializable {
     private static final long serialVersionUID = 0L;
-    private int id;
+    private long id;
     private String message;
     private String sound;
     private String soundDuration;
     private Activities activity;
     private Alarms alarm;
+    private Enums.OperationType operationType;
 
-    public Annotations(int id, String message, String sound, String soundDuration, Activities activity, Alarms alarm){
+    public Annotations(long id,
+                       String message,
+                       String sound,
+                       String soundDuration,
+                       Activities activity,
+                       Alarms alarm){
         this.id = id;
         this.message = message;
         this.sound = sound;
@@ -25,25 +31,27 @@ public class Annotations implements Serializable {
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-        out.writeInt(id);
+        out.writeLong(id);
         out.writeObject(message);
         out.writeObject(sound);
         out.writeObject(soundDuration);
         out.writeObject(activity);
         out.writeObject(alarm);
+        out.writeObject(operationType);
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
-        id = in.readInt();
+        id = in.readLong();
         message = (String) in.readObject();
         sound = (String) in.readObject();
         soundDuration = (String) in.readObject();
         activity = (Activities) in.readObject();
         alarm = (Alarms) in.readObject();
+        operationType = (Enums.OperationType) in.readObject();
     }
 
-    public int getId(){
+    public long getId(){
         return this.id;
     }
     public String getMessage(){
@@ -54,11 +62,10 @@ public class Annotations implements Serializable {
     public Activities getAtivity(){
         return this.activity;
     }
-    public Alarms getAlarm(){
-        return this.alarm;
-    }
+    public Alarms getAlarm(){ return this.alarm; }
+    public Enums.OperationType getOperationType(){ return this.operationType; }
 
-    public void setId(int id){ this.id = id; }
+    public void setId(long id){ this.id = id; }
     public void setMessage(String message){ this.message = message; }
     public void setSound(String sound){
         this.sound = sound;
@@ -68,4 +75,5 @@ public class Annotations implements Serializable {
     }
     public void setActivity(Activities activity){ this.activity = activity; }
     public void setAlarm(Alarms alarm){ this.alarm = alarm; }
+    public void setOperationType(Enums.OperationType operationType){ this.operationType = operationType; }
 }

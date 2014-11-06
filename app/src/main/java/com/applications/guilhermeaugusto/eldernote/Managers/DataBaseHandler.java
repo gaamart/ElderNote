@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.applications.guilhermeaugusto.eldernote.beans.Activities;
 import com.applications.guilhermeaugusto.eldernote.beans.Alarms;
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
+import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,9 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                 " sound TEXT," +
                 " sound_duration TEXT," +
                 " id_alarm INTEGER," +
-                " date_alarm TEXT)");
+                " date_alarm TEXT," +
+                " cycle_time_alarm INTEGER," +
+                " cycle_period_alarm INTEGER)");
     }
 
     @Override
@@ -54,7 +57,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertAnnotation(Annotations annotation){
+    public long insertAnnotation(Annotations annotation){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("id_activity", annotation.getAtivity().getId());
@@ -64,8 +67,11 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         values.put("sound_duration", annotation.getSoundDuration());
         values.put("id_alarm", annotation.getAlarm().getId());
         values.put("date_alarm", annotation.getAlarm().getDateInMillis());
-        db.insert("annotations", null, values);
+        values.put("cycle_time_alarm", annotation.getAlarm().getCycleTime());
+        values.put("cycle_period_alarm", annotation.getAlarm().getCyclePeriod().ordinal());
+        long id = db.insert("annotations", null, values);
         db.close();
+        return id;
     }
 
     public void insertActivity(Activities activity){
@@ -80,17 +86,28 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         List<Annotations> annotationsList = new ArrayList<Annotations>();
         Cursor cursor = db.query("annotations",
-                new String[]{"id", "id_activity", "title_activity", "message", "sound", "sound_duration", "id_alarm", "date_alarm"},
+                new String[]{"id",
+                        "id_activity",
+                        "title_activity",
+                        "message", "sound",
+                        "sound_duration",
+                        "id_alarm",
+                        "date_alarm",
+                        "cycle_time_alarm",
+                        "cycle_period_alarm"},
                 "id_activity" + "=?",
                 new String[]{Integer.toString(activity.getId())}, null, null, null, null);
         if(cursor.moveToFirst()){
             do{
-                Annotations annotation = new Annotations(Integer.parseInt(cursor.getString(0)),
+                Annotations annotation = new Annotations(Long.parseLong(cursor.getString(0)),
                         cursor.getString(3),
                         cursor.getString(4),
                         cursor.getString(5),
                         new Activities(Integer.parseInt(cursor.getString(1)), cursor.getString(2)),
-                        new Alarms(Integer.parseInt(cursor.getString(6)), cursor.getString(7))
+                        new Alarms(Integer.parseInt(cursor.getString(6)),
+                                cursor.getString(7),
+                                Integer.parseInt(cursor.getString(8)),
+                                Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(9))])
                 );
                 annotationsList.add(annotation);
             } while(cursor.moveToNext());
@@ -116,12 +133,15 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM annotations", null);
         if(cursor.moveToFirst()){
             do{
-                Annotations annotation = new Annotations(Integer.parseInt(cursor.getString(0)),
+                Annotations annotation = new Annotations(Long.parseLong(cursor.getString(0)),
                         cursor.getString(3),
                         cursor.getString(4),
                         cursor.getString(5),
                         new Activities(Integer.parseInt(cursor.getString(1)), cursor.getString(2)),
-                        new Alarms(Integer.parseInt(cursor.getString(6)), cursor.getString(7))
+                        new Alarms(Integer.parseInt(cursor.getString(6)),
+                                cursor.getString(7),
+                                Integer.parseInt(cursor.getString(8)),
+                                Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(9))])
                 );
                 annotationsList.add(annotation);
             } while(cursor.moveToNext());
@@ -148,8 +168,40 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     public void deleteAnnotation(Annotations annotation){
        SQLiteDatabase db = getWritableDatabase();
-        db.delete("annotations", "id=?", new String[]{ Integer.toString(annotation.getId())});
+        db.delete("annotations", "id=?", new String[]{ Long.toString(annotation.getId())});
         db.close();
+    }
+
+    public Annotations selectAnnotation(long id){
+        SQLiteDatabase db = getReadableDatabase();
+        Annotations annotation = null;
+        Cursor cursor = db.query("annotations",
+                new String[]{"id",
+                        "id_activity",
+                        "title_activity",
+                        "message", "sound",
+                        "sound_duration",
+                        "id_alarm",
+                        "date_alarm",
+                        "cycle_time_alarm",
+                        "cycle_period_alarm"},
+                "id" + "=?",
+                new String[]{Long.toString(id)}, null, null, null, null);
+        if(cursor.moveToFirst()){
+            annotation = new Annotations(Long.parseLong(cursor.getString(0)),
+                cursor.getString(3),
+                cursor.getString(4),
+                cursor.getString(5),
+                new Activities(Integer.parseInt(cursor.getString(1)), cursor.getString(2)),
+                new Alarms(Integer.parseInt(cursor.getString(6)),
+                        cursor.getString(7),
+                        Integer.parseInt(cursor.getString(8)),
+                        Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(9))])
+            );
+        }
+        db.close();
+        cursor.close();
+        return annotation;
     }
 
     public void updateAnnotation(Annotations annotation){
@@ -162,7 +214,9 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         values.put("sound_duration", annotation.getSoundDuration());
         values.put("id_alarm", annotation.getAlarm().getId());
         values.put("date_alarm", annotation.getAlarm().getDateInMillis());
-        db.update("annotations", values, "id=?", new String[]{Integer.toString(annotation.getId())});
+        values.put("cycle_time_alarm", annotation.getAlarm().getCycleTime());
+        values.put("cycle_period_alarm", annotation.getAlarm().getCyclePeriod().ordinal());
+        db.update("annotations", values, "id=?", new String[]{Long.toString(annotation.getId())});
         db.close();
     }
 }

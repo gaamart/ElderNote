@@ -21,6 +21,7 @@ import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Activities;
 import com.applications.guilhermeaugusto.eldernote.beans.Alarms;
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
+import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
         prepareSpinner();
         prepareListView();
         SoundFiles.removeNotUsedSoundFiles(annotationsList);
-        showOverLay();
+        //showOverLay();
     }
 
     @Override
@@ -75,6 +76,7 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Annotations annotation = (Annotations) listView.getItemAtPosition(position);
+                annotation.setOperationType(Enums.OperationType.Update);
                 Intent intent = new Intent(getApplicationContext(), AnnotationActivity.class);
                 intent.putExtra("Annotation", annotation);
                 startActivity(intent);
@@ -86,7 +88,8 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
 
     public void createNewAnnotationButtonOnClick(View v) {
         Intent intent = new Intent(this, AnnotationActivity.class);
-        Annotations annotation = new Annotations(-1,"","","",new Activities(-1,""), new Alarms(-1,null));
+        Annotations annotation = new Annotations(-1,"","","",new Activities(-1,""), new Alarms(-1, null, -1, Enums.PeriodTypes.None));
+        annotation.setOperationType(Enums.OperationType.Create);
         intent.putExtra("Annotation", annotation);
         startActivity(intent);
     }
@@ -142,6 +145,5 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
         });
 
         dialog.show();
-
     }
 }

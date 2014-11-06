@@ -1,5 +1,9 @@
 package com.applications.guilhermeaugusto.eldernote.beans;
 
+import android.content.Context;
+
+import com.applications.guilhermeaugusto.eldernote.R;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -20,10 +24,13 @@ public class Alarms implements  Serializable {
     private int hour;
     private int minute;
     private boolean playRingnote;
+    private boolean isCycle;
+    private int cycleTime;
+    private Enums.PeriodTypes cyclePeriod;
 
     public Alarms(){}
 
-    public Alarms(int id, String dateInMillis){
+    public Alarms(int id, String dateInMillis, int cycleTime, Enums.PeriodTypes cyclePeriod){
         this.id = id;
         this.dateInMillis = dateInMillis;
         this.year = 0;
@@ -32,25 +39,64 @@ public class Alarms implements  Serializable {
         this.hour = 0;
         this.minute = 0;
         this.playRingnote = false;
+        this.isCycle = false;
+        this.cycleTime = cycleTime;
+        this.cyclePeriod = cyclePeriod;
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         out.writeInt(id);
         out.writeObject(dateInMillis);
         out.writeBoolean(playRingnote);
+        out.writeInt(cycleTime);
+        out.writeObject(cyclePeriod);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         id = in.readInt();
         dateInMillis = (String) in.readObject();
         playRingnote = in.readBoolean();
+        cycleTime = in.readInt();
+        cyclePeriod = (Enums.PeriodTypes) in.readObject();
     }
 
-    public String createDateLayout(){
-        if(this.dateInMillis != null) {
+    public String createPeriodLayout(Context context){
+        String periodName = null;
+
+        switch (this.getCyclePeriod()){
+            case Minute: { periodName = context.getResources().getString(R.string.cyclePeriodMinuteText); break; }
+            case Hour: { periodName = context.getResources().getString(R.string.cyclePeriodHourText); break; }
+            case Day: { periodName = context.getResources().getString(R.string.cyclePeriodDayText); break; }
+            case Week: { periodName = context.getResources().getString(R.string.cyclePeriodWeekText); break; }
+            default: break;
+        }
+
+        if(this.cycleTime > 0) {
+             return context.getResources().getString(R.string.cycleAlarmDescriptionText) +
+                    Integer.toString(this.getCycleTime()) + " " +
+                    periodName;
+        } else {
+            return context.getResources().getString(R.string.nonCycleAlarmDescriptionText);
+        }
+    }
+
+    public String createDateLayout(Context context) {
+        String dateFormat;
+
+        if (this.dateInMillis != null) {
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTimeInMillis(Long.parseLong(this.dateInMillis));
-            return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(gregorianCalendar.getTime());
+            dateFormat = DateFormat.getDateInstance(DateFormat.SHORT).format(gregorianCalendar.getTime()) +
+                    context.getResources().getString(R.string.alarmInHourText) +
+                    DateFormat.getTimeInstance(DateFormat.SHORT).format(gregorianCalendar.getTime());
+
+            if(this.cycleTime > 0) {
+                return context.getResources().getString(R.string.nextAlarmDateText) +
+                        context.getResources().getString(R.string.alarmInDateText) +
+                        dateFormat;
+            } else {
+                return context.getResources().getString(R.string.alarmInDateText) + dateFormat;
+            }
         } else return null;
     }
 
@@ -61,6 +107,7 @@ public class Alarms implements  Serializable {
         gregorianCalendar.set(Calendar.DAY_OF_MONTH, this.day);
         gregorianCalendar.set(Calendar.HOUR_OF_DAY, this.hour);
         gregorianCalendar.set(Calendar.MINUTE, this.minute);
+        gregorianCalendar.set(Calendar.SECOND, 0);
         this.dateInMillis = Long.toString(gregorianCalendar.getTimeInMillis());
         return gregorianCalendar.getTimeInMillis();
     }
@@ -73,6 +120,34 @@ public class Alarms implements  Serializable {
         this.day = gregorianCalendar.get(Calendar.DAY_OF_MONTH);
         this.hour = gregorianCalendar.get(Calendar.HOUR_OF_DAY);
         this.minute = gregorianCalendar.get(Calendar.MINUTE);
+    }
+
+    public long createCycleTimeInMillis(){
+        long timeInMillis = 0;
+        switch (this.cyclePeriod){
+            case Minute: {
+                timeInMillis = 60000;
+                break;
+            }
+            case Hour: {
+                timeInMillis = 60000 * 60;
+                break;
+            }
+            case Day: {
+                timeInMillis = 60000 * 60 * 24;
+                break;
+            }
+            case Week: {
+                timeInMillis = 60000 * 60 * 24 * 7;
+                break;
+            }
+            case None: {
+                timeInMillis = 0;
+                break;
+            }
+            default: break;
+        }
+        return timeInMillis * this.cycleTime;
     }
 
     public int getId(){ return this.id;}
@@ -95,6 +170,9 @@ public class Alarms implements  Serializable {
     public boolean getPlayRingtone(){
         return this.playRingnote;
     }
+    public boolean getIsCycle() { return this.isCycle; }
+    public int getCycleTime() { return  this.cycleTime; }
+    public Enums.PeriodTypes getCyclePeriod() { return this.cyclePeriod; }
 
     public void setId(int id){this.id = id; }
     public void setDateInMillis(String dateInMillis){ this.dateInMillis = dateInMillis; }
@@ -114,4 +192,7 @@ public class Alarms implements  Serializable {
         this.minute = minute;
     }
     public void setPlayRingnote(boolean playRingnote){ this.playRingnote = playRingnote; }
+    public void setIsCycle(boolean isCycle) { this.isCycle = isCycle; }
+    public void setCycleTime(int cycleTime) { this.cycleTime = cycleTime; }
+    public void setCyclePeriod(Enums.PeriodTypes cyclePeriod) { this.cyclePeriod = cyclePeriod; }
 }

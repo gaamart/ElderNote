@@ -4,9 +4,9 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.view.WindowManager;
 
-import com.applications.guilhermeaugusto.eldernote.beans.Activities;
-import com.applications.guilhermeaugusto.eldernote.beans.Alarms;
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
 
 /**
@@ -16,11 +16,23 @@ public abstract class AlarmEntity {
 
     public static void createAlarm(Context context, Annotations annotation){
         Intent intentAlarm = new Intent(context, AlarmReciever.class);
-        intentAlarm.putExtra("Annotation", annotation);
+        intentAlarm.putExtra("Annotation_ID", annotation.getId());
+        intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intentAlarm.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP,
-                Long.parseLong(annotation.getAlarm().getDateInMillis()),
-                PendingIntent.getBroadcast(context, annotation.getAlarm().getId(), intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < Build.VERSION_CODES.KITKAT) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP,
+                    Long.parseLong(annotation.getAlarm().getDateInMillis()),
+                    PendingIntent.getBroadcast(context, annotation.getAlarm().getId(), intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP,
+                    Long.parseLong(annotation.getAlarm().getDateInMillis()),
+                    PendingIntent.getBroadcast(context, annotation.getAlarm().getId(), intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+        }
     }
 
     public static void removeAlarm(Context context, int alarmID){

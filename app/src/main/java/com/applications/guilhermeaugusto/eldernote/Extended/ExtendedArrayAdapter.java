@@ -3,21 +3,26 @@ package com.applications.guilhermeaugusto.eldernote.Extended;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applications.guilhermeaugusto.eldernote.Activities.AnnotationActivity;
+import com.applications.guilhermeaugusto.eldernote.Activities.VisualizeAnnotationActivity;
 import com.applications.guilhermeaugusto.eldernote.Managers.AlarmEntity;
 import com.applications.guilhermeaugusto.eldernote.Managers.DataBaseHandler;
 import com.applications.guilhermeaugusto.eldernote.Managers.SoundFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
+import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -58,6 +63,8 @@ public class ExtendedArrayAdapter extends ArrayAdapter<Annotations> {
         defineAlarmContent(rowView, position);
         defineAnnotationContent(rowView, position);
         defineDeleteButton(rowView,position);
+        defineEditButton(rowView,position);
+        defineVisualizeButton(rowView,position);
         return rowView;
     }
 
@@ -72,11 +79,11 @@ public class ExtendedArrayAdapter extends ArrayAdapter<Annotations> {
     }
 
     public void defineAlarmContent(View view,  int position){
-        TextView alarmPeriodDescriptionTextView = (TextView) view.findViewById(R.id.alarmPeriodDescriptionTextView);
+        //TextView alarmPeriodDescriptionTextView = (TextView) view.findViewById(R.id.alarmPeriodDescriptionTextView);
         TextView alarmDateContentTextView = (TextView) view.findViewById(R.id.alarmDateContentTextView);
         if(itemsArrayList.get(position).getAlarm().createDateLayout(getContext()) != null){
-            alarmPeriodDescriptionTextView.setText(itemsArrayList.get(position).getAlarm().createPeriodLayout(getContext()));
-            alarmDateContentTextView.setText(itemsArrayList.get(position).getAlarm().createDateLayout(getContext()));
+            //alarmPeriodDescriptionTextView.setText(itemsArrayList.get(position).getAlarm().createPeriodLayout(getContext()));
+            alarmDateContentTextView.setText(itemsArrayList.get(position).getAlarm().createDateFormat(getContext()));
         }
     }
 
@@ -113,6 +120,38 @@ public class ExtendedArrayAdapter extends ArrayAdapter<Annotations> {
                         context.getResources().getString(R.string.deleteAnnotationMessageDialogText),
                         itemsArrayList.get(position));
                 notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void defineEditButton(View view, final int position){
+        ImageButton editAnnotationButton = (ImageButton) view.findViewById(R.id.editAnnotationButton);
+        editAnnotationButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Annotations annotation = itemsArrayList.get(position);
+                annotation.setOperationType(Enums.OperationType.Update);
+                Intent intent = new Intent(context, AnnotationActivity.class);
+                intent.putExtra("Annotation", annotation);
+                context.startActivity(intent);
+            }
+        });
+    }
+
+    private void defineVisualizeButton(View view, final int position){
+        Button visualizeAnnotationButton = (Button) view.findViewById(R.id.visualizeAnnotationButton);
+        visualizeAnnotationButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Annotations annotation = itemsArrayList.get(position);
+                annotation.setOperationType(Enums.OperationType.Visualize);
+                Intent intent = new Intent(context, VisualizeAnnotationActivity.class);
+                intent.putExtra("Annotation", annotation);
+                context.startActivity(intent);
             }
         });
     }

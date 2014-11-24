@@ -10,8 +10,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,7 +18,6 @@ import android.util.Log;
 import android.media.MediaPlayer;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -28,7 +25,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.applications.guilhermeaugusto.eldernote.Dialogs.AlarmRingtoneFragment;
 import com.applications.guilhermeaugusto.eldernote.Dialogs.AudioDialogFragment;
 import com.applications.guilhermeaugusto.eldernote.Dialogs.CycleAlarmDialogFragment;
 import com.applications.guilhermeaugusto.eldernote.Managers.AlarmEntity;
@@ -49,9 +45,7 @@ import java.util.Random;
 
 public class AnnotationActivity extends FragmentActivity implements DatePickerDialog.OnDateSetListener,
                                                                     TimePickerDialog.OnTimeSetListener,
-                                                                    TextDialogFragment.TextDialogFragmentListener,
                                                                     AudioDialogFragment.SoundDialogFragmentListener,
-                                                                    AlarmRingtoneFragment.AlarmRingToneFragmentListener,
                                                                     CycleAlarmDialogFragment.CycleAlarmFragmentListener{
 //region Variables
     public Annotations currentAnnotation;
@@ -61,7 +55,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     private Handler seekHandler;
     private MediaPlayer mediaPlayer;
     private DataBaseHandler dataBaseHandler;
-    private InputMethodManager inputMethodManager;
     private DialogFragment dialogFragment;
     private Enums.ContentTypes contentType;
     private Enums.AlarmTypes alarmType;
@@ -71,11 +64,11 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     private RelativeLayout soundRecordLayout;
     private Button soundPlayingManageButton;
     private Button createAlarmButton;
-    private ImageButton deleteAlarmButton;
+    private RelativeLayout deleteAlarmLayout;
     private TextView alarmDateTextView;
     private TextView alarmCycleDescriptionTextView;
     private TextView alarmTitleTextView;
-    private ImageButton refreshContentButton;
+    private RelativeLayout refreshContentLayout;
     private TextView annotationTextView;
     private Spinner spinner;
     private Button saveButton;
@@ -89,7 +82,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_annotation);
         dataBaseHandler = new DataBaseHandler(getApplicationContext());
-        inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         getInit();
         rulesForAddDataToComponents();
         rulesForShowOperation();
@@ -128,11 +120,11 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         writeTextLayout = (RelativeLayout) findViewById(R.id.writeTextLayout);
         soundRecordLayout = (RelativeLayout) findViewById(R.id.soundRecordLayout);
         soundPlayingManageButton = (Button) findViewById(R.id.soundPlayingManageButton);
-        refreshContentButton = (ImageButton) findViewById(R.id.refreshContentButton);
+        refreshContentLayout = (RelativeLayout) findViewById(R.id.refreshContentLayout);
         annotationTextView = (TextView) findViewById(R.id.annotationTextView);
         spinner = (Spinner) findViewById(R.id.activitiesSpinner);
         createAlarmButton = (Button) findViewById(R.id.createAlarmButton);
-        deleteAlarmButton = (ImageButton) findViewById(R.id.deleteAlarmButton);
+        deleteAlarmLayout = (RelativeLayout) findViewById(R.id.deleteAlarmLayout);
         alarmDateTextView = (TextView) findViewById(R.id.alarmDateTextView);
         alarmCycleDescriptionTextView = (TextView) findViewById(R.id.alarmCycleDescriptionTextView);
         alarmTitleTextView = (TextView) findViewById(R.id.alarmTitleTextView);
@@ -211,17 +203,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         currentAlarm.setPlayRingnote(currentAnnotation.getAlarm().getPlayRingtone());
         currentAlarm.setCyclePeriod(currentAnnotation.getAlarm().getCyclePeriod());
         currentAlarm.setCycleTime(currentAnnotation.getAlarm().getCycleTime());
-        if(currentAlarm.getId() >= 0) {
-            alarmType = Enums.AlarmTypes.Created;
-
-            if(currentAlarm.getPlayRingtone()){
-                Bundle b = new Bundle();
-                b.putString(AlarmRingtoneFragment.TITLE, currentAnnotation.getAtivity().getTitle());
-                dialogFragment = new AlarmRingtoneFragment();
-                dialogFragment.setArguments(b);
-                dialogFragment.show(getSupportFragmentManager(), "alarmRingtone");
-            }
-        }
+        if(currentAlarm.getId() >= 0) { alarmType = Enums.AlarmTypes.Created; }
         else {
             if (contentType == Enums.ContentTypes.Blank){ alarmType = Enums.AlarmTypes.Hidden; }
             else alarmType = Enums.AlarmTypes.Selectable;
@@ -244,13 +226,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 okButton.setVisibility(View.INVISIBLE);
                 break;
             }
-            case Visualize: {
-                setTitle(getResources().getString(R.string.visualizeAnnotationTextView));
-                saveButton.setVisibility(View.INVISIBLE);
-                cancelButton.setVisibility(View.INVISIBLE);
-                okButton.setVisibility(View.VISIBLE);
-                break;
-            }
             default: break;
         }
     }
@@ -260,7 +235,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             case Selectable: {
                 createAlarmButton.setVisibility(View.VISIBLE);
                 alarmTitleTextView.setVisibility(View.INVISIBLE);
-                deleteAlarmButton.setVisibility(View.INVISIBLE);
+                deleteAlarmLayout.setVisibility(View.INVISIBLE);
                 alarmDateTextView.setVisibility(View.INVISIBLE);
                 alarmCycleDescriptionTextView.setVisibility(View.INVISIBLE);
                 break;
@@ -268,7 +243,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             case Created:
             case New: {
                 createAlarmButton.setVisibility(View.INVISIBLE);
-                deleteAlarmButton.setVisibility(View.VISIBLE);
+                deleteAlarmLayout.setVisibility(View.VISIBLE);
                 alarmCycleDescriptionTextView.setText(currentAlarm.createPeriodLayout(getApplicationContext()));
                 alarmDateTextView.setText(currentAlarm.createDateLayout(getApplicationContext()));
                 alarmDateTextView.setVisibility(View.VISIBLE);
@@ -279,7 +254,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             case Hidden:{
                 alarmTitleTextView.setVisibility(View.INVISIBLE);
                 createAlarmButton.setVisibility(View.INVISIBLE);
-                deleteAlarmButton.setVisibility(View.INVISIBLE);
+                deleteAlarmLayout.setVisibility(View.INVISIBLE);
                 alarmDateTextView.setVisibility(View.INVISIBLE);
                 alarmCycleDescriptionTextView.setVisibility(View.INVISIBLE);
                 break;
@@ -299,14 +274,14 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 annotationTextView.setVisibility(View.INVISIBLE);
                 seekBar.setVisibility(View.INVISIBLE);
                 soundPlayingManageButton.setVisibility(View.INVISIBLE);
-                refreshContentButton.setVisibility(View.INVISIBLE);
+                refreshContentLayout.setVisibility(View.INVISIBLE);
                 break;
             }
             case PlayingSound: {
                 annotationTextView.setVisibility(View.INVISIBLE);
                 seekBar.setVisibility(View.VISIBLE);
                 soundPlayingManageButton.setVisibility(View.VISIBLE);
-                refreshContentButton.setVisibility(View.INVISIBLE);
+                refreshContentLayout.setVisibility(View.INVISIBLE);
                 soundPlayingManageButton.setText(getResources().getString(R.string.stopPlayButtonText));
                 break;
             }
@@ -314,7 +289,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 annotationTextView.setVisibility(View.INVISIBLE);
                 seekBar.setVisibility(View.VISIBLE);
                 soundPlayingManageButton.setVisibility(View.VISIBLE);
-                refreshContentButton.setVisibility(View.VISIBLE);
+                refreshContentLayout.setVisibility(View.VISIBLE);
                 soundPlayingManageButton.setText(getResources().getString(R.string.startPlayButtonText));
                 break;
             }
@@ -322,7 +297,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
                 annotationTextView.setVisibility(View.VISIBLE);
                 seekBar.setVisibility(View.INVISIBLE);
                 soundPlayingManageButton.setVisibility(View.INVISIBLE);
-                refreshContentButton.setVisibility(View.VISIBLE);
+                refreshContentLayout.setVisibility(View.VISIBLE);
                 break;
             }
             default: break;
@@ -450,40 +425,30 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             b.putInt(TimePickerFragment.MINUTE, c.get(Calendar.MINUTE));
         }
 
-        dialogFragment = new TimePickerFragment();
-        dialogFragment.setArguments(b);
-        dialogFragment.show(getSupportFragmentManager(), "frag_time_picker");
+        Long currentTime = System.currentTimeMillis() - (60000 * 60 * 24);
+        currentAlarm.createTimeInMillis();
+        if (currentTime < Long.parseLong(currentAlarm.getDateInMillis())) {
+            dialogFragment = new TimePickerFragment();
+            dialogFragment.setArguments(b);
+            dialogFragment.show(getSupportFragmentManager(), "frag_time_picker");
+        } else{
+            callErroDialog(getResources().getString(R.string.olderAlarmErroTitleDialogText),
+                    getResources().getString(R.string.olderAlarmErroMessageDialogText));
+        }
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         currentAlarm.setHour(hourOfDay);
         currentAlarm.setMinute(minute);
         currentAlarm.createTimeInMillis();
-        currentAlarm.setId(randInt());
-        callCycleAlarmDialog();
-    }
-
-    public void onTextDialogPositiveClick(EditText editText){
-        inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        if(editText.getText().toString() != null && !editText.getText().toString().isEmpty()) {
-            currentAnnotation.setMessage(editText.getText().toString());
-            annotationTextView.setText(editText.getText().toString());
-            contentType = Enums.ContentTypes.ShowingText;
-            rulesForShowComponents();
-        } else {
-            returnTextToLastState();
-            callErroDialog(getResources().getString(R.string.emptyTextErroTitleDialogText),
-                    getResources().getString(R.string.emptyTextErroMessageDialogText));
+        Long currentTime = System.currentTimeMillis() - 60000;
+        if (currentTime < Long.parseLong(currentAlarm.getDateInMillis())) {
+            currentAlarm.setId(randInt());
+            callCycleAlarmDialog();
+        } else{
+            callErroDialog(getResources().getString(R.string.olderAlarmErroTitleDialogText),
+                    getResources().getString(R.string.olderAlarmErroMessageDialogText));
         }
-        if(alarmType == Enums.AlarmTypes.Hidden) {
-            alarmType = Enums.AlarmTypes.Selectable;
-            rulesForShowAlarm();
-        }
-    }
-
-    public void onTextDialogNegativeClick(EditText editText){
-        inputMethodManager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        returnTextToLastState();
     }
 
     public void onSoundDialogPositiveClick(String soundCreated){
@@ -501,10 +466,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     }
 
     public void onSoundDialogNegativeClick(){ returnSoundToLastState(); }
-
-    public void onAlarmRingtoneDialogClick(){
-        currentAlarm.setPlayRingnote(false);
-    }
 
     public void onCycleAlarmDialogPositiveClick(int time, Enums.PeriodTypes period) {
         currentAlarm.setCycleTime(time);
@@ -547,15 +508,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
         rulesForShowComponents();
     }
 
-    private void returnTextToLastState(){
-        if(currentAnnotation.getMessage() == null || currentAnnotation.getMessage().isEmpty()){ contentType = Enums.ContentTypes.Blank; }
-        else {
-            contentType = Enums.ContentTypes.ShowingText;
-            annotationTextView.setText(currentAnnotation.getMessage());
-        }
-        rulesForShowComponents();
-    }
-
     private void goToMainActivity(){
         releaseMedia();
         currentAnnotation = null;
@@ -573,12 +525,16 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     }
 
     private void callTextFragmentDialog(){
-        contentType = Enums.ContentTypes.EditingText;
-        Bundle b = new Bundle();
-        b.putString(TextDialogFragment.TEXT, currentAnnotation.getMessage());
-        dialogFragment = new TextDialogFragment();
-        dialogFragment.setArguments(b);
-        dialogFragment.show(getSupportFragmentManager(), "text");
+        //annotation.setOperationType(Enums.OperationType.Visualize);
+        Intent intent = new Intent(getApplicationContext(), EditTextActivity.class);
+        intent.putExtra("Annotation", currentAnnotation);
+        startActivity(intent);
+        //contentType = Enums.ContentTypes.EditingText;
+        //Bundle b = new Bundle();
+        //b.putString(TextDialogFragment.TEXT, currentAnnotation.getMessage());
+        //dialogFragment = new TextDialogFragment();
+        //dialogFragment.setArguments(b);
+        //dialogFragment.show(getSupportFragmentManager(), "text");
     }
 
     private void callDeleteDialog(String title, String message, final Enums.DeleteTypes deleteType){
@@ -615,6 +571,7 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
     private void callCycleAlarmDialog(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AnnotationActivity.this);
         alertDialogBuilder.setMessage(getResources().getString(R.string.cycleAlarmMessageDialogText))
+                .setTitle(getResources().getString(R.string.cycleAlarmTitleDialogText))
                 .setCancelable(false)
                 .setPositiveButton(getResources().getString(R.string.deletePositiveButtonDialogText), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog,int id) {
@@ -662,20 +619,6 @@ public class AnnotationActivity extends FragmentActivity implements DatePickerDi
             currentAnnotation.setSound(null);
             releaseMedia();
         }
-    }
-//endregion
-
-//region MenuMethods
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.annotation, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 //endregion
 }

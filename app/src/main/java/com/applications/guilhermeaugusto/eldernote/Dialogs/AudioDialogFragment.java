@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 
 import com.applications.guilhermeaugusto.eldernote.Managers.SoundFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
@@ -51,26 +53,11 @@ public class AudioDialogFragment extends DialogFragment {
         View view = layoutInflater.inflate(R.layout.dialog_sound, null);
         visualizerView = (VisualizerView) view.findViewById(R.id.visualizerView);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(getResources().getString(R.string.soundDialogTitleText));
-        builder.setView(view)
-                .setPositiveButton(getResources().getString(R.string.doneText), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int id) {
-                        userFinish = true;
-                        userCancel = false;
-                        stopRecording();
-                    }
-                })
-                .setNegativeButton(getResources().getString(R.string.cancelText), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int id) {
-                        userFinish = true;
-                        userCancel = true;
-                        stopRecording();
-                    }
-                });
+        builder.setView(view);
         Dialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
+        defineCancelButton(view, dialog);
+        defineDoneButton(view, dialog);
         return dialog;
     }
 
@@ -168,5 +155,35 @@ public class AudioDialogFragment extends DialogFragment {
             }
             recordingThread = null;
         }
+    }
+
+    private void defineCancelButton(View view, final Dialog dialog){
+        Button cancelButton = (Button) view.findViewById(R.id.cancelButton);
+        cancelButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                userFinish = true;
+                userCancel = true;
+                stopRecording();
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void defineDoneButton(View view, final Dialog dialog){
+        Button doneButton = (Button) view.findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                userFinish = true;
+                userCancel = false;
+                stopRecording();
+                dialog.dismiss();
+            }
+        });
     }
 }

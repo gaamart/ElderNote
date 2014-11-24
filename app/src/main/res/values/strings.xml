@@ -12,7 +12,6 @@
     <string name="recordingSoundTextView">Gravando</string>
     <string name="createAnnotationTextView">Criando uma anotação</string>
     <string name="updateAnnotationTextView">Modificando uma anotação</string>
-    <string name="visualizeAnnotationTextView">Visualizando uma anotação</string>
     <string name="spinnerFistElementText">Todas as atividades</string>
     <string name="titleTextView">Título:</string>
     <string name="annotationTextView">Anotação:</string>
@@ -23,12 +22,13 @@
     <string name="deleteAnnotationButtonText">Deletar</string>
     <string name="updateAnnotationButtonText">Atualizar</string>
     <string name="doneText">Feito</string>
+    <string name="stopText">Parar</string>
     <string name="eraseButtonText">Descartar</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="deleteAlarmButtonText">Deletar</string>
     <string name="createSoundDurantionText">"Duração de: "</string>
     <string name="soundSecondText">"segundo"</string>
-    <string name="datePickerDialogTitleText">"Defina a data"</string>
+    <string name="datePickerDialogTitleText">"Definir data"</string>
     <string name="timePickerDialogTitleText">"Defina o horário"</string>
     <string name="textDialogTitleText">"Digite o texto"</string>
     <string name="soundDialogTitleText">"Fale agora"</string>
@@ -50,6 +50,7 @@
     <string name="deleteAlarmAccessibilityText">Deletar alarme</string>
     <string name="refreshContentAccessibilityText">Refaz o conteúdo da anotação</string>
     <string name="deleteAnnotationAccessibilityText">Deletar anotação</string>
+    <string name="editAnnotationAccessibilityText">Atualizar anotação</string>
     <string name="iconSearchAccessibilityText">procurar</string>
     <string name="emptyTextErroTitleDialogText">Texto em branco</string>
     <string name="emptyTextErroMessageDialogText">Não é possível inserir um texto em branco, por favor tente novamente</string>
@@ -57,7 +58,9 @@
     <string name="emptyContentErroMessageDialogText">Não é possível salvar uma anotação sem conteúdo, por favor tente novamente</string>
     <string name="emptyListViewText">Não há anotações</string>
     <string name="alarmAccessibilityText">Alarme</string>
+    <string name="cycleAlarmTitleDialogText">Repetir lembrete</string>
     <string name="cycleAlarmMessageDialogText">Deseja que o lembrete se repita?</string>
+    <string name="cycleAlarmFragmentTitleText">Com qual frequência?</string>
     <string name="cycleAlarmDescriptionText">"Irá tocar a cada: "</string>
     <string name="nonCycleAlarmDescriptionText">"Irá tocar apenas uma vez "</string>
     <string name="alarmInDateText">"no dia: "</string>
@@ -68,5 +71,9 @@
     <string name="cyclePeriodDayText">"dia(s)"</string>
     <string name="cyclePeriodWeekText">"semana(s)"</string>
     <string name="alarmTitleTextView">"Lembrete:"</string>
-    <string name="alarmRingtoneFragmentTitleText">"Hora de "</string>
+    <string name="alarmRingtoneDateText">"Agora é hora de: "</string>
+    <string name="cyclePeriodEachText">"A cada:"</string>
+    <string name="emptyAlarmText">"Esta anotação não possui lembrete"</string>
+    <string name="olderAlarmErroTitleDialogText">"Alarme no passado"</string>
+    <string name="olderAlarmErroMessageDialogText">"Não é possível criar um alarme antes da data atual."</string>
 </resources>

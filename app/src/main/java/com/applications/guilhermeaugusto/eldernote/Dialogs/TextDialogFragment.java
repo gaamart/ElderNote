@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.applications.guilhermeaugusto.eldernote.R;
@@ -44,26 +45,12 @@ public class TextDialogFragment extends DialogFragment {
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.dialog_text, null);
 
-        editText = (EditText) view.findViewById(R.id.dialogAnnotationEditText);
+        editText = (EditText) view.findViewById(R.id.annotationEditText);
         editText.setText(text);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getResources().getString(R.string.textDialogTitleText));
-        builder.setView(view)
-                .setPositiveButton(getResources().getString(R.string.doneText), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int id) {
-                        userFinish = true;
-                        listener.onTextDialogPositiveClick(editText);
-                    }
-                })
-                .setNegativeButton(getResources().getString(R.string.cancelText), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int id) {
-                        userFinish = true;
-                        listener.onTextDialogNegativeClick(editText);
-                    }
-                });
+        builder.setView(view);
         Dialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -74,5 +61,33 @@ public class TextDialogFragment extends DialogFragment {
     public void onDismiss(DialogInterface dialog){
         super.dismiss();
         if(!userFinish){ listener.onTextDialogPositiveClick(editText); }
+    }
+
+    private void defineCancelButton(View view, final Dialog dialog){
+        Button cancelButton = (Button) view.findViewById(R.id.cancelButton);
+        cancelButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                userFinish = true;
+                listener.onTextDialogNegativeClick(editText);
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void defineDoneButton(View view, final Dialog dialog){
+        Button doneButton = (Button) view.findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                userFinish = true;
+                listener.onTextDialogPositiveClick(editText);
+                dialog.dismiss();
+            }
+        });
     }
 }

@@ -52,7 +52,7 @@ public class AlarmRingtoneFragment  extends DialogFragment {
         View view = layoutInflater.inflate(R.layout.dialog_alarm, null);
         createAlarmAnnimation(view);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle( getResources().getString(R.string.alarmRingtoneFragmentTitleText) + title);
+        //builder.setTitle( getResources().getString(R.string.alarmRingtoneTitleText) + title);
         builder.setView(view)
                 .setPositiveButton(getResources().getString(R.string.doneText), new DialogInterface.OnClickListener() {
                     @Override

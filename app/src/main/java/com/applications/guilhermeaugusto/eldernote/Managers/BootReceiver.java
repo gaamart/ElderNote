@@ -59,7 +59,7 @@ public class BootReceiver extends BroadcastReceiver
 
     private void createNotification(Context context, Annotations annotation){
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.abc_ic_search)
+                        .setSmallIcon(R.drawable.eldernote)
                         .setContentTitle(annotation.getAtivity().getTitle())
                         .setContentText(annotation.getAlarm().createDateLayout(context));
         Intent activityIntent = new Intent(context, AnnotationActivity.class);

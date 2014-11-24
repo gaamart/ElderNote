@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.view.WindowManager;
 
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
 
@@ -17,11 +16,7 @@ public abstract class AlarmEntity {
     public static void createAlarm(Context context, Annotations annotation){
         Intent intentAlarm = new Intent(context, AlarmReciever.class);
         intentAlarm.putExtra("Annotation_ID", annotation.getId());
-        intentAlarm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intentAlarm.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
-                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        intentAlarm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         int sdk = android.os.Build.VERSION.SDK_INT;
         if(sdk < Build.VERSION_CODES.KITKAT) {

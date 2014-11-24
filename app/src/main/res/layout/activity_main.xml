@@ -32,28 +32,25 @@
             android:orientation="horizontal"
             android:paddingTop="@dimen/activity_vertical_margin">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageView"
-                android:background="@android:drawable/ic_menu_search"
-                android:layout_gravity="center"
-                android:contentDescription="@string/iconSearchAccessibilityText" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:id="@+id/searchTextView"
                 android:text="@string/searchTextViewText"
                 android:layout_gravity="center_vertical"/>
 
-            <Spinner
-                android:layout_width="fill_parent"
+            <RelativeLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/annotationsFilterSpinner"
-                android:textSize="22sp"/>
+                android:background="@xml/roundedrectangleshape">
+                <Spinner
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/annotationsFilterSpinner"
+                    android:textSize="18sp"/>
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout

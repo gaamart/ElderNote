@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
 
+import com.applications.guilhermeaugusto.eldernote.Extended.ExtendedArrayAdapter;
+import com.applications.guilhermeaugusto.eldernote.Extended.ExtendedDataPickerDialog;
 import com.applications.guilhermeaugusto.eldernote.R;
 
 public class DatePickerFragment extends DialogFragment {
@@ -41,8 +43,8 @@ public class DatePickerFragment extends DialogFragment {
         int m = b.getInt(MONTH);
         int d = b.getInt(DATE);
 
-        final DatePickerDialog picker = new DatePickerDialog(getActivity(), getConstructorListener(), y, m, d);
-        picker.setTitle(getResources().getString(R.string.datePickerDialogTitleText));
+        final ExtendedDataPickerDialog picker = new ExtendedDataPickerDialog(getActivity(), getConstructorListener(), y, m, d);
+        picker.setPermanentTitle(getResources().getString(R.string.datePickerDialogTitleText));
         picker.setCanceledOnTouchOutside(false);
         if (hasJellyBeanAndAbove()) {
             picker.setButton(DialogInterface.BUTTON_POSITIVE,

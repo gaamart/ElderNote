@@ -86,9 +86,7 @@ public class Alarms implements  Serializable {
         if (this.dateInMillis != null) {
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTimeInMillis(Long.parseLong(this.dateInMillis));
-            dateFormat = DateFormat.getDateInstance(DateFormat.SHORT).format(gregorianCalendar.getTime()) +
-                    context.getResources().getString(R.string.alarmInHourText) +
-                    DateFormat.getTimeInstance(DateFormat.SHORT).format(gregorianCalendar.getTime());
+            dateFormat = createDateFormat(context);
 
             if(this.cycleTime > 0) {
                 return context.getResources().getString(R.string.nextAlarmDateText) +
@@ -98,6 +96,14 @@ public class Alarms implements  Serializable {
                 return context.getResources().getString(R.string.alarmInDateText) + dateFormat;
             }
         } else return null;
+    }
+
+    public String createDateFormat(Context context){
+        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+        gregorianCalendar.setTimeInMillis(Long.parseLong(this.dateInMillis));
+        return DateFormat.getDateInstance(DateFormat.SHORT).format(gregorianCalendar.getTime()) +
+                context.getResources().getString(R.string.alarmInHourText) +
+                DateFormat.getTimeInstance(DateFormat.SHORT).format(gregorianCalendar.getTime());
     }
 
     public Long createTimeInMillis(){

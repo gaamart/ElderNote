@@ -46,6 +46,7 @@ public class CycleAlarmDialogFragment extends DialogFragment {
         numberPicker.setMaxValue(60);
         numberPicker.setMinValue(1);
         numberPicker.setWrapSelectorWheel(false);
+        numberPicker.setValue(30);
 
         final NumberPicker stringPicker = (NumberPicker) view.findViewById(R.id.stringPicker);
         stringPicker.setMinValue(0);
@@ -54,10 +55,13 @@ public class CycleAlarmDialogFragment extends DialogFragment {
                 getResources().getString(R.string.cyclePeriodHourText),
                 getResources().getString(R.string.cyclePeriodDayText),
                 getResources().getString(R.string.cyclePeriodWeekText) });
-        numberPicker.setWrapSelectorWheel(false);
+        stringPicker.setWrapSelectorWheel(false);
+        stringPicker.setValue(2);
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view)
+                .setTitle(getResources().getString(R.string.cycleAlarmFragmentTitleText))
                 .setPositiveButton(getResources().getString(R.string.doneText), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int id) {

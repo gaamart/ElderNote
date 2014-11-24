@@ -5,8 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -53,35 +51,20 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
         //showOverLay();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private void prepareListView(){
         dataAdapter = new ExtendedArrayAdapter(this, new ArrayList<Annotations>());
         dataAdapter.setTheListener(this);
         listView.setAdapter(dataAdapter);
-        listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Annotations annotation = (Annotations) listView.getItemAtPosition(position);
-                annotation.setOperationType(Enums.OperationType.Update);
-                Intent intent = new Intent(getApplicationContext(), AnnotationActivity.class);
-                intent.putExtra("Annotation", annotation);
-                startActivity(intent);
-            }
-        });
+//        listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Annotations annotation = (Annotations) listView.getItemAtPosition(position);
+//                annotation.setOperationType(Enums.OperationType.Visualize);
+//                Intent intent = new Intent(getApplicationContext(), VisualizeAnnotationActivity.class);
+//                intent.putExtra("Annotation", annotation);
+//                startActivity(intent);
+//            }
+//        });
         currentActivity = null;
         populateListViewByActivity();
     }

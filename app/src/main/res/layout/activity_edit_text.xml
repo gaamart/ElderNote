@@ -1,33 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#fff2f2f5">
 
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="fill_parent"
         android:layout_height="64dp"
-        android:text="@string/cycleAlarmFragmentTitleText"
+        android:text="@string/textDialogTitleText"
         android:textSize="40sp"
         android:textStyle="bold"
         android:visibility="visible"
         android:gravity="center"
-        android:background="#ffd4d5d5"/>
+        android:background="#ffd4d5d5"
+        android:layout_alignParentTop="true"/>
 
-    <ListView
-        android:id="@+id/listView"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
-
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:layout_below="@+id/titleTextView"
+        android:layout_above="@+id/controllerLayout">
+        <EditText
+            android:id="@+id/annotationEditText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:background="#00000000"
+            android:textSize="18sp"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="false"/>
+    </ScrollView>
     <RelativeLayout
         android:id="@+id/controllerLayout"
         android:layout_width="fill_parent"
         android:layout_height="96dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingTop="@dimen/activity_vertical_margin">
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:layout_alignParentBottom="true">
 
         <Button
             android:id="@+id/cancelButton"
@@ -53,4 +69,4 @@
             android:layout_alignParentEnd="true"
             android:background="@drawable/green_small_button" />
     </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

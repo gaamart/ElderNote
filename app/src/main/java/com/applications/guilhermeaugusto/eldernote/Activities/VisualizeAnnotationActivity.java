@@ -50,6 +50,7 @@ public class VisualizeAnnotationActivity extends Activity {
     private TextView annotationTitleTextView;
     private RelativeLayout annotationMessageLayout;
     private LinearLayout alarmControllerLayout;
+    private LinearLayout titleLayout;
     private boolean startPlaying;
     private static final String LOG_TAG = "AlarmDialogFragmentLog";
 
@@ -96,6 +97,7 @@ public class VisualizeAnnotationActivity extends Activity {
         annotationTitleTextView = (TextView) findViewById(R.id.annotationTitleTextView);
         annotationMessageLayout = (RelativeLayout) findViewById(R.id.annotationMessageLayout);
         alarmControllerLayout = (LinearLayout) findViewById(R.id.alarmControllerLayout);
+        titleLayout = (LinearLayout) findViewById(R.id.titleLayout);
     }
 
     public void onClick(View view) {
@@ -157,13 +159,11 @@ public class VisualizeAnnotationActivity extends Activity {
     }
 
     private void fillComponents(){
-
-        titleTextView.setText(annotation.getAtivity().getTitle());
-
         if(annotation.getMessage() != null && !annotation.getMessage().isEmpty()){
             annotationTextView.setText(annotation.getMessage());
         }
         else {
+            titleTextView.setText(annotation.getAtivity().getTitle());
             prepareToPlayingSound();
             prepareSeekBar();
         }
@@ -184,6 +184,7 @@ public class VisualizeAnnotationActivity extends Activity {
             annotationTitleTextView.setVisibility(View.INVISIBLE);
             annotationMessageLayout.setVisibility(View.INVISIBLE);
             alarmControllerLayout.setVisibility(View.INVISIBLE);
+            titleLayout.setVisibility(View.INVISIBLE);
             startAlarmAnnimation();
         } else {
             setTitle(getResources().getString(R.string.app_name));
@@ -196,10 +197,12 @@ public class VisualizeAnnotationActivity extends Activity {
                 annotationTextView.setVisibility(View.VISIBLE);
                 seekBar.setVisibility(View.INVISIBLE);
                 soundPlayingButton.setVisibility(View.INVISIBLE);
+                titleLayout.setVisibility(View.INVISIBLE);
             } else {
                 annotationTextView.setVisibility(View.INVISIBLE);
                 seekBar.setVisibility(View.VISIBLE);
                 soundPlayingButton.setVisibility(View.VISIBLE);
+                titleLayout.setVisibility(View.VISIBLE);
             }
             if(annotation.getAlarm().getId() >= 0 ) {
                 alarmDateTextView.setVisibility(View.VISIBLE);

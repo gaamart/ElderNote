@@ -1,14 +1,14 @@
 package com.applications.guilhermeaugusto.eldernote.Dialogs;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TimePicker;
 
 import com.applications.guilhermeaugusto.eldernote.R;
@@ -20,65 +20,66 @@ public class TimePickerFragment extends DialogFragment{
 
     public static final String HOUR = "Hour";
     public static final String MINUTE = "Minute";
-
-    private boolean isCancelled = true;
-    private TimePickerDialog.OnTimeSetListener mListener;
-
-    private TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            if (!isCancelled) { mListener.onTimeSet(view,hourOfDay,minute); }
-        }
-    };
+    private TimePicker timePicker;
+    private TimePickerDialog.OnTimeSetListener listener;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.mListener = (TimePickerDialog.OnTimeSetListener) activity;
+        try {
+            listener = (TimePickerDialog.OnTimeSetListener) activity;
+        } catch (ClassCastException e) { throw new ClassCastException(activity.toString() + "must implement TimePickerFragmentListener"); }
     }
 
     @Override
     public void onDetach() {
-        this.mListener = null;
+        listener = null;
         super.onDetach();
     }
 
-    @TargetApi(11)
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle saveInstanceState) {
         Bundle b = getArguments();
         int h = b.getInt(HOUR);
         int m = b.getInt(MINUTE);
 
-        final TimePickerDialog picker = new TimePickerDialog(getActivity(), getConstructorListener(), h, m,
-                DateFormat.is24HourFormat(getActivity()));
-
-        picker.setCanceledOnTouchOutside(false);
-        if (hasJellyBeanAndAbove()) {
-            picker.setButton(DialogInterface.BUTTON_POSITIVE,
-                    getResources().getString(R.string.doneText),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            isCancelled = false;
-                        }
-                    });
-            picker.setButton(DialogInterface.BUTTON_NEGATIVE,
-                    getResources().getString(R.string.cancelText),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            isCancelled = true;
-                        }
-                    });
-        }
-        return picker;
+        LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+        View view = layoutInflater.inflate(R.layout.dialog_time_picker, null);
+        timePicker = (TimePicker) view.findViewById(R.id.timePicker);
+        timePicker.setIs24HourView(true);
+        timePicker.setCurrentHour(h);
+        timePicker.setCurrentMinute(m);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(view);
+        Dialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        defineCancelButton(view, dialog);
+        defineDoneButton(view, dialog);
+        return dialog;
     }
 
-    private static boolean hasJellyBeanAndAbove() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    private void defineCancelButton(View view, final Dialog dialog){
+        Button cancelButton = (Button) view.findViewById(R.id.cancelButton);
+        cancelButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                dialog.dismiss();
+            }
+        });
     }
 
-    private TimePickerDialog.OnTimeSetListener getConstructorListener() {
-        return hasJellyBeanAndAbove() ? mTimeSetListener : mListener;
+    private void defineDoneButton(View view, final Dialog dialog){
+        Button doneButton = (Button) view.findViewById(R.id.doneButton);
+        doneButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                listener.onTimeSet(timePicker, timePicker.getCurrentHour(), timePicker.getCurrentMinute());
+                dialog.dismiss();
+            }
+        });
     }
 }

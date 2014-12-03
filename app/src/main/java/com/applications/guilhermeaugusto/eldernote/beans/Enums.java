@@ -7,6 +7,11 @@ public abstract class Enums {
     public enum OperationType { Create, Update, Visualize, Triggered }
     public enum AlarmTypes { Selectable, New, Created, Hidden }
     public enum ContentTypes { Blank, EditingText, RecordingSound, PlayingSound, ShowingText, ShowingSound }
-    public enum DeleteTypes {Annotation, Alarm }
-    public enum PeriodTypes { Minute, Hour, Day, Week, None }
+    public enum MessageTypes {ErrorMessage, DeleteMessage, DecisionMessage }
+    public enum PeriodTypes { EachSixHours, EachEightHours, EachTwelveHours, EverDay, EveryOtherDay, EverWeek, None }
 }
+
+
+
+
+

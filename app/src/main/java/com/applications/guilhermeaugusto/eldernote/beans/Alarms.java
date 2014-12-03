@@ -25,12 +25,11 @@ public class Alarms implements  Serializable {
     private int minute;
     private boolean playRingnote;
     private boolean isCycle;
-    private int cycleTime;
     private Enums.PeriodTypes cyclePeriod;
 
     public Alarms(){}
 
-    public Alarms(int id, String dateInMillis, int cycleTime, Enums.PeriodTypes cyclePeriod){
+    public Alarms(int id, String dateInMillis, Enums.PeriodTypes cyclePeriod){
         this.id = id;
         this.dateInMillis = dateInMillis;
         this.year = 0;
@@ -40,7 +39,6 @@ public class Alarms implements  Serializable {
         this.minute = 0;
         this.playRingnote = false;
         this.isCycle = false;
-        this.cycleTime = cycleTime;
         this.cyclePeriod = cyclePeriod;
     }
 
@@ -48,7 +46,6 @@ public class Alarms implements  Serializable {
         out.writeInt(id);
         out.writeObject(dateInMillis);
         out.writeBoolean(playRingnote);
-        out.writeInt(cycleTime);
         out.writeObject(cyclePeriod);
     }
 
@@ -56,24 +53,24 @@ public class Alarms implements  Serializable {
         id = in.readInt();
         dateInMillis = (String) in.readObject();
         playRingnote = in.readBoolean();
-        cycleTime = in.readInt();
         cyclePeriod = (Enums.PeriodTypes) in.readObject();
     }
 
     public String createPeriodLayout(Context context){
         String periodName = null;
 
-        switch (this.getCyclePeriod()){
-            case Minute: { periodName = context.getResources().getString(R.string.cyclePeriodMinuteText); break; }
-            case Hour: { periodName = context.getResources().getString(R.string.cyclePeriodHourText); break; }
-            case Day: { periodName = context.getResources().getString(R.string.cyclePeriodDayText); break; }
-            case Week: { periodName = context.getResources().getString(R.string.cyclePeriodWeekText); break; }
+        switch (this.cyclePeriod){
+            case EachSixHours: { periodName = context.getResources().getString(R.string.cyclePeriodEachSixHoursText); break; }
+            case EachEightHours: { periodName = context.getResources().getString(R.string.cyclePeriodEachEightHoursText); break; }
+            case EachTwelveHours: { periodName = context.getResources().getString(R.string.cyclePeriodEachTwelveHoursText); break; }
+            case EverDay: { periodName = context.getResources().getString(R.string.cyclePeriodEverDayText ); break; }
+            case EveryOtherDay: { periodName = context.getResources().getString(R.string.cyclePeriodEveryOtherDayText ); break; }
+            case EverWeek: { periodName = context.getResources().getString(R.string.cyclePeriodEverWeekText ); break; }
             default: break;
         }
 
-        if(this.cycleTime > 0) {
+        if(this.getCyclePeriod() != Enums.PeriodTypes.None) {
              return context.getResources().getString(R.string.cycleAlarmDescriptionText) +
-                    Integer.toString(this.getCycleTime()) + " " +
                     periodName;
         } else {
             return context.getResources().getString(R.string.nonCycleAlarmDescriptionText);
@@ -88,7 +85,7 @@ public class Alarms implements  Serializable {
             gregorianCalendar.setTimeInMillis(Long.parseLong(this.dateInMillis));
             dateFormat = createDateFormat(context);
 
-            if(this.cycleTime > 0) {
+            if(this.getCyclePeriod() != Enums.PeriodTypes.None) {
                 return context.getResources().getString(R.string.nextAlarmDateText) +
                         context.getResources().getString(R.string.alarmInDateText) +
                         dateFormat;
@@ -131,29 +128,16 @@ public class Alarms implements  Serializable {
     public long createCycleTimeInMillis(){
         long timeInMillis = 0;
         switch (this.cyclePeriod){
-            case Minute: {
-                timeInMillis = 60000;
-                break;
-            }
-            case Hour: {
-                timeInMillis = 60000 * 60;
-                break;
-            }
-            case Day: {
-                timeInMillis = 60000 * 60 * 24;
-                break;
-            }
-            case Week: {
-                timeInMillis = 60000 * 60 * 24 * 7;
-                break;
-            }
-            case None: {
-                timeInMillis = 0;
-                break;
-            }
+            case EachSixHours: { timeInMillis = 60000 * 60 * 6; break; }
+            case EachEightHours: { timeInMillis = 60000 * 60 * 8; break; }
+            case EachTwelveHours: { timeInMillis = 60000 * 60 * 12; break; }
+            case EverDay: { timeInMillis = 60000 * 60 * 24; break; }
+            case EveryOtherDay: { timeInMillis = 60000 * 60 * 24 * 2; break; }
+            case EverWeek: { timeInMillis = 60000 * 60 * 24 * 7; break; }
+            case None: { timeInMillis = 0; break; }
             default: break;
         }
-        return timeInMillis * this.cycleTime;
+        return timeInMillis;
     }
 
     public int getId(){ return this.id;}
@@ -177,7 +161,6 @@ public class Alarms implements  Serializable {
         return this.playRingnote;
     }
     public boolean getIsCycle() { return this.isCycle; }
-    public int getCycleTime() { return  this.cycleTime; }
     public Enums.PeriodTypes getCyclePeriod() { return this.cyclePeriod; }
 
     public void setId(int id){this.id = id; }
@@ -199,6 +182,5 @@ public class Alarms implements  Serializable {
     }
     public void setPlayRingnote(boolean playRingnote){ this.playRingnote = playRingnote; }
     public void setIsCycle(boolean isCycle) { this.isCycle = isCycle; }
-    public void setCycleTime(int cycleTime) { this.cycleTime = cycleTime; }
     public void setCyclePeriod(Enums.PeriodTypes cyclePeriod) { this.cyclePeriod = cyclePeriod; }
 }

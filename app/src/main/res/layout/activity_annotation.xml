@@ -10,35 +10,9 @@
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
         android:layout_above="@+id/alarmControllerLayout"
         android:layout_alignParentTop="true">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/titleTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/titleTextView"
-                android:textSize="22sp"
-                android:textStyle="bold"/>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@xml/roundedrectangleshape">
-                <Spinner
-                    android:id="@+id/activitiesSpinner"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"/>
-            </RelativeLayout>
-        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -157,6 +131,30 @@
                     android:background="@drawable/small_button"/>
             </LinearLayout>
         </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/titleLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_above="@+id/alarmControllerLayout">
+
+        <TextView
+            android:id="@+id/labelTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/titleTextView"
+            android:textSize="22sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"/>
     </LinearLayout>
 
     <RelativeLayout

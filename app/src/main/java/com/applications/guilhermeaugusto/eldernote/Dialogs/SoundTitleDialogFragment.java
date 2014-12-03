@@ -3,58 +3,66 @@ package com.applications.guilhermeaugusto.eldernote.Dialogs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
+import com.applications.guilhermeaugusto.eldernote.Activities.AnnotationActivity;
 import com.applications.guilhermeaugusto.eldernote.Extended.ActivitiesArrayAdapter;
+import com.applications.guilhermeaugusto.eldernote.Managers.DataBaseHandler;
 import com.applications.guilhermeaugusto.eldernote.R;
+import com.applications.guilhermeaugusto.eldernote.beans.Activities;
+import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
 import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 
 import java.util.ArrayList;
-
+import java.util.List;
 
 /**
- * Created by guilhermemartins on 10/22/14.
+ * Created by guilhermemartins on 12/2/14.
  */
-public class CycleAlarmDialogFragment extends DialogFragment {
+public class SoundTitleDialogFragment extends DialogFragment {
 
-    private static final String LOG_TAG = "CycleAlarmDialogFragmentLog";
     private boolean userFinish = false;
     private int itemPosition = -1;
     private ListView listView;
+    private List<Activities> activities;
     private ActivitiesArrayAdapter adapter;
+    private DataBaseHandler dataBaseHandler;
 
-    public interface CycleAlarmFragmentListener {
-        public void onCycleAlarmDialogPositiveClick(Enums.PeriodTypes period);
-        public void onCycleAlarmDialogNegativeClick();
+    public interface SoundTitleFragmentListener {
+        public void onSoundTitleDialogPositiveClick(Activities activity);
+        public void onSoundTitleDialogNegativeClick();
     }
 
-    CycleAlarmFragmentListener listener;
+    SoundTitleFragmentListener listener;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            listener = (CycleAlarmFragmentListener) activity;
-        } catch (ClassCastException e) { throw new ClassCastException(activity.toString() + "must implement CycleAlarmFragmentListener"); }
+            listener = (SoundTitleFragmentListener) activity;
+        } catch (ClassCastException e) { throw new ClassCastException(activity.toString() + "must implement SoundTitleFragmentListener"); }
     }
 
     @Override
     public void onStart(){
         super.onStart();
+        dataBaseHandler = new DataBaseHandler(getActivity());
+        activities = dataBaseHandler.selectAllActivities();
         ArrayList<String> arrayList = new ArrayList<String>();
-        arrayList.add(getResources().getString(R.string.cyclePeriodEachSixHoursText));
-        arrayList.add(getResources().getString(R.string.cyclePeriodEachEightHoursText));
-        arrayList.add(getResources().getString(R.string.cyclePeriodEachTwelveHoursText));
-        arrayList.add(getResources().getString(R.string.cyclePeriodEverDayText));
-        arrayList.add(getResources().getString(R.string.cyclePeriodEveryOtherDayText));
-        arrayList.add(getResources().getString(R.string.cyclePeriodEverWeekText));
+        for(int i=0; i < activities.size(); i++){ arrayList.add(activities.get(i).getTitle()); }
         adapter = new ActivitiesArrayAdapter(getActivity(), arrayList);
         listView.setAdapter(adapter);
     }
@@ -93,7 +101,7 @@ public class CycleAlarmDialogFragment extends DialogFragment {
             public void onClick(View v)
             {
                 userFinish = true;
-                listener.onCycleAlarmDialogNegativeClick();
+                listener.onSoundTitleDialogNegativeClick();
                 dialog.dismiss();
             }
         });
@@ -107,7 +115,7 @@ public class CycleAlarmDialogFragment extends DialogFragment {
             public void onClick(View v)
             {
                 userFinish = true;
-                listener.onCycleAlarmDialogPositiveClick(Enums.PeriodTypes.values()[itemPosition]);
+                listener.onSoundTitleDialogPositiveClick(activities.get(itemPosition));
                 dialog.dismiss();
             }
         });
@@ -117,7 +125,7 @@ public class CycleAlarmDialogFragment extends DialogFragment {
     public void onDismiss(DialogInterface dialog){
         super.dismiss();
         if(!userFinish) {
-            listener.onCycleAlarmDialogNegativeClick();
+            listener.onSoundTitleDialogNegativeClick();
         }
     }
 }

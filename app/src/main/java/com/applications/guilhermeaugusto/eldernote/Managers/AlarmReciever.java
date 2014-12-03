@@ -19,7 +19,7 @@ public class AlarmReciever extends BroadcastReceiver {
         DataBaseHandler dataBaseHandler = new DataBaseHandler(context);
         Intent activityIntent = new Intent(context, VisualizeAnnotationActivity.class);
         Annotations annotation = dataBaseHandler.selectAnnotation(intent.getLongExtra("Annotation_ID", 0));
-        if(annotation.getAlarm().getCycleTime() > 0) {
+        if(annotation.getAlarm().getCyclePeriod() != Enums.PeriodTypes.None) {
             Long dateInMillis = Long.parseLong(annotation.getAlarm().getDateInMillis());
             Long periodInMillis = annotation.getAlarm().createCycleTimeInMillis();
             annotation.getAlarm().setDateInMillis(Long.toString(dateInMillis + periodInMillis));

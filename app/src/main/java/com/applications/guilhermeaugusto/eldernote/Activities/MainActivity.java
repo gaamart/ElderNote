@@ -6,14 +6,11 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.applications.guilhermeaugusto.eldernote.Extended.AnnotationsArrayAdapter;
 import com.applications.guilhermeaugusto.eldernote.Managers.DataBaseHandler;
-import com.applications.guilhermeaugusto.eldernote.Extended.ExtendedArrayAdapter;
 import com.applications.guilhermeaugusto.eldernote.Managers.SoundFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Activities;
@@ -24,13 +21,12 @@ import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements ExtendedArrayAdapter.ExtendedArrayAdapterListener {
+public class MainActivity extends ActionBarActivity implements AnnotationsArrayAdapter.ExtendedArrayAdapterListener {
 
     private DataBaseHandler dataBaseHandler;
     private ListView listView;
     private TextView emptyAnnotationsListView;
-    private ExtendedArrayAdapter dataAdapter;
-    private static final String LOG_TAG = "ElderNoteLog";
+    private AnnotationsArrayAdapter dataAdapter;
     private  List<Annotations> annotationsList = new ArrayList<Annotations>();
     private Activities currentActivity;
 
@@ -45,14 +41,13 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
         setContentView(R.layout.activity_main);
         dataBaseHandler = new DataBaseHandler(getApplicationContext());
         init();
-        prepareSpinner();
         prepareListView();
         SoundFiles.removeNotUsedSoundFiles(annotationsList);
         //showOverLay();
     }
 
     private void prepareListView(){
-        dataAdapter = new ExtendedArrayAdapter(this, new ArrayList<Annotations>());
+        dataAdapter = new AnnotationsArrayAdapter(this, new ArrayList<Annotations>());
         dataAdapter.setTheListener(this);
         listView.setAdapter(dataAdapter);
 //        listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
@@ -71,32 +66,10 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
 
     public void createNewAnnotationButtonOnClick(View v) {
         Intent intent = new Intent(this, AnnotationActivity.class);
-        Annotations annotation = new Annotations(-1,"","","",new Activities(-1,""), new Alarms(-1, null, -1, Enums.PeriodTypes.None));
+        Annotations annotation = new Annotations(-1,"","","",new Activities(-1,""), new Alarms(-1, null, Enums.PeriodTypes.None));
         annotation.setOperationType(Enums.OperationType.Create);
         intent.putExtra("Annotation", annotation);
         startActivity(intent);
-    }
-
-    private void prepareSpinner(){
-        Spinner spinner = (Spinner) findViewById(R.id.annotationsFilterSpinner);
-        ArrayAdapter<Activities> dataAdapter = new ArrayAdapter<Activities>(this,
-                android.R.layout.simple_spinner_item,
-                dataBaseHandler.selectAllActivities());
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dataAdapter.insert(new Activities(0,getResources().getString(R.string.spinnerFistElementText)),0);
-        spinner.setAdapter(dataAdapter);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                if(position == 0) currentActivity = null;
-                else currentActivity = (Activities) parentView.getItemAtPosition(position);
-                populateListViewByActivity();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) { }
-        });
     }
 
     private void populateListViewByActivity(){
@@ -126,7 +99,6 @@ public class MainActivity extends ActionBarActivity implements ExtendedArrayAdap
                 dialog.dismiss();
             }
         });
-
         dialog.show();
     }
 }

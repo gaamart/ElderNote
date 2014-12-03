@@ -39,8 +39,7 @@ public class BootReceiver extends BroadcastReceiver
                         createNotification(context, annotation);
                         callNotificationRingtone(context);
                 }
-                if (annotation.getAlarm().getCycleTime() > 0) {
-
+                if(annotation.getAlarm().getCyclePeriod() != Enums.PeriodTypes.None) {
                     while (System.currentTimeMillis() > Long.parseLong(annotation.getAlarm().getDateInMillis())) {
                         Long dateInMillis = Long.parseLong(annotation.getAlarm().getDateInMillis());
                         Long periodInMillis = annotation.getAlarm().createCycleTimeInMillis();

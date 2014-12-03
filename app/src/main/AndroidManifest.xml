@@ -24,10 +24,20 @@
             android:windowSoftInputMode="stateHidden|adjustNothing" >
         </activity>
         <activity
+            android:name=".Activities.SoundTitleDialogFragment"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustNothing" >
+        </activity>
+        <activity
             android:name=".Activities.VisualizeAnnotationActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustNothing">
+            android:windowSoftInputMode="stateHidden|adjustNothing"
+            android:parentActivityName=".Activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activities.MainActivity" />
         </activity>
         <activity
             android:name=".Activities.EditTextActivity"

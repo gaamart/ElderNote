@@ -49,7 +49,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                 " sound_duration TEXT," +
                 " id_alarm INTEGER," +
                 " date_alarm TEXT," +
-                " cycle_time_alarm INTEGER," +
                 " cycle_period_alarm INTEGER)");
     }
 
@@ -70,7 +69,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         values.put("sound_duration", annotation.getSoundDuration());
         values.put("id_alarm", annotation.getAlarm().getId());
         values.put("date_alarm", annotation.getAlarm().getDateInMillis());
-        values.put("cycle_time_alarm", annotation.getAlarm().getCycleTime());
         values.put("cycle_period_alarm", annotation.getAlarm().getCyclePeriod().ordinal());
         long id = db.insert("annotations", null, values);
         db.close();
@@ -96,7 +94,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                         "sound_duration",
                         "id_alarm",
                         "date_alarm",
-                        "cycle_time_alarm",
                         "cycle_period_alarm"},
                 "id_activity" + "=?",
                 new String[]{Integer.toString(activity.getId())}, null, null, null, null);
@@ -109,8 +106,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                         new Activities(Integer.parseInt(cursor.getString(1)), cursor.getString(2)),
                         new Alarms(Integer.parseInt(cursor.getString(6)),
                                 cursor.getString(7),
-                                Integer.parseInt(cursor.getString(8)),
-                                Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(9))])
+                                Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(8))])
                 );
                 annotationsList.add(annotation);
             } while(cursor.moveToNext());
@@ -143,8 +139,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                         new Activities(Integer.parseInt(cursor.getString(1)), cursor.getString(2)),
                         new Alarms(Integer.parseInt(cursor.getString(6)),
                                 cursor.getString(7),
-                                Integer.parseInt(cursor.getString(8)),
-                                Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(9))])
+                                Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(8))])
                 );
                 annotationsList.add(annotation);
             } while(cursor.moveToNext());
@@ -186,7 +181,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                         "sound_duration",
                         "id_alarm",
                         "date_alarm",
-                        "cycle_time_alarm",
                         "cycle_period_alarm"},
                 "id" + "=?",
                 new String[]{Long.toString(id)}, null, null, null, null);
@@ -198,8 +192,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                 new Activities(Integer.parseInt(cursor.getString(1)), cursor.getString(2)),
                 new Alarms(Integer.parseInt(cursor.getString(6)),
                         cursor.getString(7),
-                        Integer.parseInt(cursor.getString(8)),
-                        Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(9))])
+                        Enums.PeriodTypes.values()[Integer.parseInt(cursor.getString(8))])
             );
         }
         db.close();
@@ -217,7 +210,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         values.put("sound_duration", annotation.getSoundDuration());
         values.put("id_alarm", annotation.getAlarm().getId());
         values.put("date_alarm", annotation.getAlarm().getDateInMillis());
-        values.put("cycle_time_alarm", annotation.getAlarm().getCycleTime());
         values.put("cycle_period_alarm", annotation.getAlarm().getCyclePeriod().ordinal());
         db.update("annotations", values, "id=?", new String[]{Long.toString(annotation.getId())});
         db.close();

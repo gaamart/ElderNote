@@ -54,7 +54,7 @@ public class BarGraphRenderer extends Renderer
       byte rfk = data.getBytes()[mDivisions * i];
       byte ifk = data.getBytes()[mDivisions * i + 1];
       float magnitude = (rfk * rfk + ifk * ifk);
-      int dbValue = (int) (10 * Math.log10(magnitude));
+      int dbValue = (int) (15 * mDivisions * Math.log10(magnitude));
 
       if(mTop)
       {

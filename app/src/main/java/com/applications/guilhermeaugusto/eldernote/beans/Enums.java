@@ -9,6 +9,8 @@ public abstract class Enums {
     public enum ContentTypes { Blank, EditingText, RecordingSound, PlayingSound, ShowingText, ShowingSound }
     public enum MessageTypes {ErrorMessage, DeleteMessage, DecisionMessage }
     public enum PeriodTypes { EachSixHours, EachEightHours, EachTwelveHours, EverDay, EveryOtherDay, EverWeek, None }
+    public enum AlarmStageTypes { DateSelection, TimeSelection, CycleDecision, PeriodSelection }
+    public enum BackActionTypes { Upper, Bottom, ByButton }
 }
 
 

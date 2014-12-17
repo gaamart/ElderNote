@@ -1,5 +1,6 @@
 package com.applications.guilhermeaugusto.eldernote.Activities;
 
+import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.app.Dialog;
 import android.content.Intent;
@@ -9,7 +10,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.applications.guilhermeaugusto.eldernote.Extended.AnnotationsArrayAdapter;
+import com.applications.guilhermeaugusto.eldernote.ArrayAdapters.AnnotationsArrayAdapter;
 import com.applications.guilhermeaugusto.eldernote.Managers.DataBaseHandler;
 import com.applications.guilhermeaugusto.eldernote.Managers.SoundFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
@@ -21,7 +22,7 @@ import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements AnnotationsArrayAdapter.ExtendedArrayAdapterListener {
+public class MainActivity extends ActionBarActivity {
 
     private DataBaseHandler dataBaseHandler;
     private ListView listView;
@@ -48,18 +49,17 @@ public class MainActivity extends ActionBarActivity implements AnnotationsArrayA
 
     private void prepareListView(){
         dataAdapter = new AnnotationsArrayAdapter(this, new ArrayList<Annotations>());
-        dataAdapter.setTheListener(this);
         listView.setAdapter(dataAdapter);
-//        listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Annotations annotation = (Annotations) listView.getItemAtPosition(position);
-//                annotation.setOperationType(Enums.OperationType.Visualize);
-//                Intent intent = new Intent(getApplicationContext(), VisualizeAnnotationActivity.class);
-//                intent.putExtra("Annotation", annotation);
-//                startActivity(intent);
-//            }
-//        });
+        listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Annotations annotation = (Annotations) listView.getItemAtPosition(position);
+                annotation.setOperationType(Enums.OperationType.Visualize);
+                Intent intent = new Intent(getApplicationContext(), VisualizeAnnotationActivity.class);
+                intent.putExtra("Annotation", annotation);
+                startActivity(intent);
+            }
+        });
         currentActivity = null;
         populateListViewByActivity();
     }
@@ -83,10 +83,6 @@ public class MainActivity extends ActionBarActivity implements AnnotationsArrayA
             emptyAnnotationsListView.setVisibility(View.INVISIBLE);
         } else { emptyAnnotationsListView.setVisibility(View.VISIBLE); }
         dataAdapter.notifyDataSetChanged();
-    }
-
-    public void onDeleteClick(){
-        populateListViewByActivity();
     }
 
     private void showOverLay(){

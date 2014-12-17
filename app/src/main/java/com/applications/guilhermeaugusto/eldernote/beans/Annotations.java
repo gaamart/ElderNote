@@ -51,6 +51,14 @@ public class Annotations implements Serializable {
         operationType = (Enums.OperationType) in.readObject();
     }
 
+    public boolean contentIsText(){
+        return this.message != null && !this.message.isEmpty();
+    }
+
+    public boolean contentIsSound(){
+        return this.sound != null && !this.sound.isEmpty();
+    }
+
     public long getId(){
         return this.id;
     }

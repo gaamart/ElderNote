@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.applications.guilhermeaugusto.eldernote.Activities.AnnotationActivity;
 import com.applications.guilhermeaugusto.eldernote.R;
@@ -57,10 +56,19 @@ public class BootReceiver extends BroadcastReceiver
     }
 
     private void createNotification(Context context, Annotations annotation){
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.eldernote)
-                        .setContentTitle(annotation.getAtivity().getTitle())
-                        .setContentText(annotation.getAlarm().createDateLayout(context));
+        NotificationCompat.Builder mBuilder;
+
+        if(annotation.contentIsText()){
+            mBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.eldernote)
+                    .setContentTitle(annotation.getMessage())
+                    .setContentText(annotation.getAlarm().createDateLayout(context));
+        } else {
+            mBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.eldernote)
+                    .setContentTitle(annotation.getAtivity().getTitle())
+                    .setContentText(annotation.getAlarm().createDateLayout(context));
+        }
         Intent activityIntent = new Intent(context, AnnotationActivity.class);
         annotation.setOperationType(Enums.OperationType.Visualize);
         activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

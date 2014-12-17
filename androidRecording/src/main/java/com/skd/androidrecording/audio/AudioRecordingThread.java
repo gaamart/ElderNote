@@ -38,7 +38,7 @@ import com.skd.androidrecording.fft.FFT;
 
 public class AudioRecordingThread extends Thread {
 	private static final String FILE_NAME = "audiorecordtest.raw";
-	private static final int SAMPLING_RATE = 11025;
+	private static final int SAMPLING_RATE = 44100;
 	private static final int FFT_POINTS  = 256;
 	private static final int MAGIC_SCALE = 100;
 	

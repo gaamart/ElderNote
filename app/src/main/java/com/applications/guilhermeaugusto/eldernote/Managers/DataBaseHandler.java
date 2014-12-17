@@ -31,13 +31,12 @@ public class DataBaseHandler extends SQLiteOpenHelper {
                 "(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                 " title TEXT NOT NULL)");
 
-        db.execSQL("INSERT INTO activities (title) VALUES ('Fazer')");
-        db.execSQL("INSERT INTO activities (title) VALUES ('Pagar')");
-        db.execSQL("INSERT INTO activities (title) VALUES ('Ir até')");
-        db.execSQL("INSERT INTO activities (title) VALUES ('Comprar')");
-        db.execSQL("INSERT INTO activities (title) VALUES ('Tomar')");
-        db.execSQL("INSERT INTO activities (title) VALUES ('Visitar')");
-        db.execSQL("INSERT INTO activities (title) VALUES ('Falar com')");
+        db.execSQL("INSERT INTO activities (title) VALUES ('Pagamento')");
+        db.execSQL("INSERT INTO activities (title) VALUES ('Compras')");
+        db.execSQL("INSERT INTO activities (title) VALUES ('Medicamento')");
+        db.execSQL("INSERT INTO activities (title) VALUES ('Visita')");
+        db.execSQL("INSERT INTO activities (title) VALUES ('Conversa')");
+        db.execSQL("INSERT INTO activities (title) VALUES ('Telefonema')");
         db.execSQL("INSERT INTO activities (title) VALUES ('Outros')");
 
         db.execSQL("CREATE TABLE annotations " +

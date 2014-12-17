@@ -1,4 +1,4 @@
-package com.applications.guilhermeaugusto.eldernote.Extended;
+package com.applications.guilhermeaugusto.eldernote.ArrayAdapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,13 +15,13 @@ import java.util.ArrayList;
 /**
  * Created by guilhermemartins on 12/1/14.
  */
-public class ActivitiesArrayAdapter extends ArrayAdapter<String> {
+public class BasicArrayAdapter extends ArrayAdapter<String> {
 
     private final Context context;
     private final ArrayList<String> itemsArrayList;
     private int selectedItem = -1;
 
-    public ActivitiesArrayAdapter(Context context, ArrayList<String> itemsArrayList) {
+    public BasicArrayAdapter(Context context, ArrayList<String> itemsArrayList) {
         super(context, R.layout.row_basic, itemsArrayList);
         this.itemsArrayList = itemsArrayList;
         this.context = context;

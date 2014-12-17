@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/dialog_content"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:background="#fff2f2f5">
 
     <TextView
-        android:id="@+id/titleTextView"
         android:layout_width="fill_parent"
         android:layout_height="56dp"
-        android:text="@string/textDialogTitleText"
+        android:id="@+id/titleTextView"
         android:textSize="40sp"
         android:textStyle="bold"
         android:visibility="visible"
@@ -18,23 +16,65 @@
         android:background="#ffd4d5d5"
         android:layout_alignParentTop="true"/>
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
         android:layout_below="@+id/titleTextView"
         android:layout_above="@+id/controllerLayout">
-        <EditText
-            android:id="@+id/annotationEditText"
+
+        <LinearLayout
+            android:id="@+id/visualizerLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@xml/roundedrectangleshape">
+
+                <com.skd.androidrecording.visualizer.VisualizerView
+                    android:id="@+id/visualizerView"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp">
+                </com.skd.androidrecording.visualizer.VisualizerView>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/recordingSoundTextView"
+                android:text="@string/recordingSoundTextView"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/listLayout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:gravity="top|start"
-            android:background="#00000000"
-            android:textSize="18sp"
-            android:scrollbars="vertical"
-            android:fadeScrollbars="false"/>
-    </ScrollView>
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/selectionSoundTitleTextView"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/selectingDescriptionTextView"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/controllerLayout"
         android:layout_width="fill_parent"
@@ -61,7 +101,6 @@
             android:id="@+id/doneButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/doneText"
             android:textStyle="bold"
             android:textSize="22sp"
             android:onClick="onClick"

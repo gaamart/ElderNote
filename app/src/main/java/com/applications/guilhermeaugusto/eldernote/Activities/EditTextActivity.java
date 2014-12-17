@@ -18,12 +18,11 @@ import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 /**
  * Created by guilhermemartins on 11/24/14.
  */
-public class EditTextActivity extends FragmentActivity {
+public class EditTextActivity extends FragmentActivity implements MessageDialogFragment.MessageFragmentListener {
 
     private Annotations annotation;
     private EditText annotationEditText;
     private InputMethodManager inputMethodManager;
-    private DialogFragment dialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +32,7 @@ public class EditTextActivity extends FragmentActivity {
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         annotation = (Annotations) getIntent().getSerializableExtra("Annotation");
         annotationEditText = (EditText) findViewById(R.id.annotationEditText);
-        if(annotation.getMessage() != null && !annotation.getMessage().isEmpty()){
+        if(annotation.contentIsText()){
             annotationEditText.setText(annotation.getMessage());
         }
     }
@@ -73,8 +72,12 @@ public class EditTextActivity extends FragmentActivity {
         messageBundle.putSerializable(MessageDialogFragment.TYPE, messageType);
         messageBundle.putString(MessageDialogFragment.TITLE, title);
         messageBundle.putString(MessageDialogFragment.MESSAGE, message);
-        dialogFragment = new MessageDialogFragment();
+        DialogFragment dialogFragment = new MessageDialogFragment();
         dialogFragment.setArguments(messageBundle);
         dialogFragment.show(getSupportFragmentManager(), "message_dialog");
     }
+
+    public void onMessageDialogPositiveClick(Enums.MessageTypes messageType) { }
+
+    public void onMessageDialogNegativeClick(Enums.MessageTypes messageType) { }
 }

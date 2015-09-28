@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.applications.guilhermeaugusto.eldernote.Managers.LogFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Enums;
 
@@ -73,6 +74,7 @@ public class MessageDialogFragment extends DialogFragment {
     }
 
     private void defineCancelButton(View view, final Dialog dialog){
+        LogFiles.writeButtonActionLog(Enums.ActivityType.PopUp, Enums.ButtonActionTypes.NO);
         Button cancelButton = (Button) view.findViewById(R.id.cancelButton);
         cancelButton.setVisibility(View.VISIBLE);
         cancelButton.setOnClickListener(new View.OnClickListener()
@@ -87,6 +89,7 @@ public class MessageDialogFragment extends DialogFragment {
     }
 
     private void defineOkButton(View view, final Dialog dialog){
+        LogFiles.writeButtonActionLog(Enums.ActivityType.PopUp, Enums.ButtonActionTypes.YES);
         Button okButton = (Button) view.findViewById(R.id.okButton);
         okButton.setVisibility(View.VISIBLE);
         okButton.setOnClickListener(new View.OnClickListener()
@@ -100,6 +103,7 @@ public class MessageDialogFragment extends DialogFragment {
     }
 
     private void defineDoneButton(View view, final Dialog dialog){
+        LogFiles.writeButtonActionLog(Enums.ActivityType.PopUp, Enums.ButtonActionTypes.Done);
         Button doneButton = (Button) view.findViewById(R.id.doneButton);
         doneButton.setVisibility(View.VISIBLE);
         doneButton.setOnClickListener(new View.OnClickListener()

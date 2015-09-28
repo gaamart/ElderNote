@@ -11,9 +11,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -39,7 +39,7 @@ import java.io.IOException;
 /**
  * Created by guilhermemartins on 11/7/14.
  */
-public class VisualizeAnnotationActivity extends ActionBarActivity implements MessageDialogFragment.MessageFragmentListener {
+public class VisualizeAnnotationActivity extends FragmentActivity implements MessageDialogFragment.MessageFragmentListener {
 
     private boolean startPlaying;
     private DataBaseHandler dataBaseHandler;
@@ -51,7 +51,6 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
     private Annotations annotation;
     private Handler seekHandler;
 
-    private TextView titleTextView;
     private TextView annotationTextView;
     private TextView alarmCycleDescriptionTextView;
     private TextView alarmDateTextView;
@@ -60,10 +59,11 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
     private Button deleteButton;
     private Button editButton;
     private ImageView alarmImageView;
+    private RelativeLayout alarmRingtoneLayout;
     private TextView annotationTitleTextView;
+    private TextView soundTitleTextView;
     private RelativeLayout annotationMessageLayout;
     private LinearLayout alarmControllerLayout;
-    private LinearLayout titleLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +76,18 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
             callAlarmRingtone();
             startVibrate();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.VisualizeAnnotation, "Stop");
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.VisualizeAnnotation, "BackButton");
     }
 
     @Override
@@ -93,7 +105,7 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
         init();
         fillComponents();
         showComponents();
-        setTitle(getResources().getString(R.string.backText));
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.VisualizeAnnotation, "Start");
     }
 
     @Override
@@ -103,60 +115,55 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        LogFiles.writeBackActionLog(Enums.BackActionTypes.Bottom);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                super.onBackPressed();
-                item.setTitle(getResources().getString(R.string.backText));
-                LogFiles.writeBackActionLog(Enums.BackActionTypes.Upper);
-
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            LogFiles.writeTouchLog(Enums.ActivityType.VisualizeAnnotation, event.getX(), event.getY());
         }
-        return true;
+
+        return super.onTouchEvent(event);
     }
 
     public void init() {
-        titleTextView = (TextView) findViewById(R.id.titleTextView);
         annotationTextView = (TextView) findViewById(R.id.annotationTextView);
         alarmCycleDescriptionTextView = (TextView) findViewById(R.id.alarmCycleDescriptionTextView);
         alarmDateTextView = (TextView) findViewById(R.id.alarmDateTextView);
         seekBar = (SeekBar) findViewById(R.id.soundProgressSeekbar);
         soundPlayingButton = (Button) findViewById(R.id.soundPlayingButton);
         alarmImageView = (ImageView) findViewById(R.id.alarmRingtoneImageView);
+        alarmRingtoneLayout = (RelativeLayout) findViewById(R.id.alarmRingtoneLayout);
         doneButton = (Button) findViewById(R.id.doneButton);
         deleteButton = (Button) findViewById(R.id.deleteButton);
         editButton = (Button) findViewById(R.id.editButton);
         annotationTitleTextView = (TextView) findViewById(R.id.annotationTitleTextView);
+        soundTitleTextView = (TextView) findViewById(R.id.soundTitleTextView);
         annotationMessageLayout = (RelativeLayout) findViewById(R.id.annotationMessageLayout);
         alarmControllerLayout = (LinearLayout) findViewById(R.id.alarmControllerLayout);
-        titleLayout = (LinearLayout) findViewById(R.id.titleLayout);
     }
 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.deleteButton: {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.VisualizeAnnotation, Enums.ButtonActionTypes.Delete);
                 callMessageDialog(getResources().getString(R.string.deleteAnnotationTitleDialogText),
                         getResources().getString(R.string.deleteAnnotationMessageDialogText),
                         Enums.MessageTypes.DecisionMessage);
                 break;
             }
             case R.id.editButton: {
-                goToAnnotationActivity();
+                LogFiles.writeButtonActionLog(Enums.ActivityType.VisualizeAnnotation, Enums.ButtonActionTypes.Update);
+                goToEditAnnotationActivity();
                 break;
             }
             case R.id.doneButton: {
                 if (annotation.getOperationType() == Enums.OperationType.Triggered) {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.VisualizeAnnotation, Enums.ButtonActionTypes.Stop);
                     ringtone.stop();
                     vibrator.cancel();
                     annotation.setOperationType(Enums.OperationType.Visualize);
                     showComponents();
                 } else {
-                    LogFiles.writeBackActionLog(Enums.BackActionTypes.ByButton);
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.VisualizeAnnotation, Enums.ButtonActionTypes.Back);
                     goToMainActivity();
                 }
                 break;
@@ -164,9 +171,11 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
             case R.id.soundPlayingButton: {
                 startPlaying = !startPlaying;
                 if (startPlaying) {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.VisualizeAnnotation, Enums.ButtonActionTypes.Listen);
                     soundPlayingButton.setText(getResources().getString(R.string.stopPlayButtonText));
                     mediaPlayer.start();
                 } else {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.VisualizeAnnotation, Enums.ButtonActionTypes.Pause);
                     soundPlayingButton.setText(getResources().getString(R.string.startPlayButtonText));
                     mediaPlayer.pause();
                 }
@@ -212,7 +221,7 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
         if (annotation.contentIsText()) {
             annotationTextView.setText(annotation.getMessage());
         } else {
-            titleTextView.setText(annotation.getAtivity().getTitle());
+            annotationTitleTextView.setText(annotation.getAtivity().getTitle());
             prepareToPlayingSound();
             prepareSeekBar();
         }
@@ -227,37 +236,44 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
     private void showComponents() {
 
         if (annotation.getOperationType() == Enums.OperationType.Triggered) {
-            setTitle(getResources().getString(R.string.alarmRingtoneDateText));
-            doneButton.setVisibility(View.VISIBLE);
+            annotationTitleTextView.setText(getResources().getString(R.string.alarmRingtoneDateText));
             editButton.setVisibility(View.INVISIBLE);
             deleteButton.setVisibility(View.INVISIBLE);
+            doneButton.setVisibility(View.VISIBLE);
             doneButton.setText(getResources().getString(R.string.stopText));
             alarmImageView.setVisibility(View.VISIBLE);
-            annotationTitleTextView.setVisibility(View.INVISIBLE);
-            annotationMessageLayout.setVisibility(View.INVISIBLE);
+            alarmRingtoneLayout.setVisibility(View.VISIBLE);
+            if (annotation.contentIsText()) {
+                soundTitleTextView.setVisibility(View.INVISIBLE);
+                annotationMessageLayout.setVisibility(View.VISIBLE);
+            }
+            else {
+                annotationMessageLayout.setVisibility(View.INVISIBLE);
+                soundTitleTextView.setVisibility(View.VISIBLE);
+                soundTitleTextView.setText(annotation.getAtivity().getTitle());
+            }
             alarmControllerLayout.setVisibility(View.INVISIBLE);
-            titleLayout.setVisibility(View.INVISIBLE);
             startAlarmAnnimation();
         } else {
-            setTitle(getResources().getString(R.string.app_name));
             doneButton.setText(getResources().getString(R.string.backText));
-            doneButton.setVisibility(View.INVISIBLE);
+            doneButton.setVisibility(View.VISIBLE);
             editButton.setVisibility(View.VISIBLE);
             deleteButton.setVisibility(View.VISIBLE);
-            annotationTitleTextView.setVisibility(View.VISIBLE);
             annotationMessageLayout.setVisibility(View.VISIBLE);
             alarmControllerLayout.setVisibility(View.VISIBLE);
+            soundTitleTextView.setVisibility(View.INVISIBLE);
             alarmImageView.setVisibility(View.INVISIBLE);
+            alarmRingtoneLayout.setVisibility(View.INVISIBLE);
             if (annotation.contentIsText()) {
+                annotationTitleTextView.setText(getResources().getString(R.string.annotationText));
                 annotationTextView.setVisibility(View.VISIBLE);
                 seekBar.setVisibility(View.INVISIBLE);
                 soundPlayingButton.setVisibility(View.INVISIBLE);
-                titleLayout.setVisibility(View.INVISIBLE);
             } else {
+                annotationTitleTextView.setText(annotation.getAtivity().getTitle());
                 annotationTextView.setVisibility(View.INVISIBLE);
                 seekBar.setVisibility(View.VISIBLE);
                 soundPlayingButton.setVisibility(View.VISIBLE);
-                titleLayout.setVisibility(View.VISIBLE);
             }
             if (annotation.getAlarm().getId() >= 0) {
                 alarmDateTextView.setVisibility(View.VISIBLE);
@@ -328,16 +344,18 @@ public class VisualizeAnnotationActivity extends ActionBarActivity implements Me
     }
 
     private void goToMainActivity() {
-        releaseMedia();
+        releaseMedia  ();
+        LogFiles.writeAnnotationsLog(annotation);
         annotation = null;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
-    private void goToAnnotationActivity() {
+    private void goToEditAnnotationActivity() {
         releaseMedia();
+        LogFiles.writeAnnotationsLog(annotation);
         annotation.setOperationType(Enums.OperationType.Update);
-        Intent intent = new Intent(getApplicationContext(), AnnotationActivity.class);
+        Intent intent = new Intent(getApplicationContext(), EditAnnotationActivity.class);
         intent.putExtra("Annotation", annotation);
         startActivity(intent);
     }

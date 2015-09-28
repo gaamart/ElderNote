@@ -4,20 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.applications.guilhermeaugusto.eldernote.ArrayAdapters.BasicArrayAdapter;
 import com.applications.guilhermeaugusto.eldernote.Dialogs.MessageDialogFragment;
+import com.applications.guilhermeaugusto.eldernote.Managers.LogFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Alarms;
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
@@ -47,31 +47,53 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
     private Button doneButton;
     private Button cancelButton;
     private TextView titleTextView;
-    private TextView subTitleTextView;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_alarm);
         annotation = (Annotations) getIntent().getSerializableExtra("Annotation");
+        Annotations oldAnnotation = new Annotations(annotation.getId(),
+                                                    annotation.getMessage(),
+                                                    annotation.getSound(),
+                                                    annotation.getSoundDuration(),
+                                                    annotation.getAtivity(),
+                                                    annotation.getAlarm());
+        annotation.setOldAnnotation(oldAnnotation);
         alarm = new Alarms();
         init();
         manageComponents();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.EditAlarm, "Start");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.EditAlarm, "Stop");
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.EditAlarm, "BackButton");
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            LogFiles.writeTouchLog(Enums.ActivityType.EditAlarm, event.getX(), event.getY());
+        }
+
+        return super.onTouchEvent(event);
+    }
+
     private void init(){
-        Calendar c = Calendar.getInstance();
-        datePicker = (DatePicker) findViewById(R.id.datePicker);
-        datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), null);
-
-        timePicker = (TimePicker) findViewById(R.id.timePicker);
-        timePicker.setIs24HourView(true);
-        timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
-        timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
-
         dateLayout = (LinearLayout) findViewById(R.id.dateLayout);
         timeLayout = (LinearLayout) findViewById(R.id.timeLayout);
         listLayout = (LinearLayout) findViewById(R.id.listLayout);
@@ -81,8 +103,9 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
         cancelButton = (Button) findViewById(R.id.cancelButton);
         listView = (ListView) findViewById(R.id.listView);
         titleTextView = (TextView) findViewById(R.id.titleTextView);
-        subTitleTextView = (TextView) findViewById(R.id.subTitleTextView);
+
         prepareListView();
+        preparePickers();
 
         alarmStage = Enums.AlarmStageTypes.DateSelection;
     }
@@ -103,8 +126,28 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 itemPosition = position;
                 adapter.setSelectedItem(position);
+                LogFiles.writeButtonActionLog(Enums.ActivityType.EditAlarm, Enums.ButtonActionTypes.Select);
             }
         });
+    }
+
+    private void preparePickers(){
+        datePicker = (DatePicker) findViewById(R.id.datePicker);
+        timePicker = (TimePicker) findViewById(R.id.timePicker);
+
+        if(annotation.getAlarm().getId() > -1){
+            annotation.getAlarm().createDateConponentesByTimeInMillis();
+            datePicker.init(annotation.getAlarm().getYear(), annotation.getAlarm().getMonth(), annotation.getAlarm().getDay(), null);
+            timePicker.setIs24HourView(true);
+            timePicker.setCurrentHour(annotation.getAlarm().getHour());
+            timePicker.setCurrentMinute(annotation.getAlarm().getMinute());
+        } else {
+            Calendar c = Calendar.getInstance();
+            datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), null);
+            timePicker.setIs24HourView(true);
+            timePicker.setCurrentHour(c.get(Calendar.HOUR_OF_DAY));
+            timePicker.setCurrentMinute(c.get(Calendar.MINUTE));
+        }
     }
 
     private void manageComponents(){
@@ -117,29 +160,25 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
             case DateSelection: {
                 doneButton.setText(getResources().getString(R.string.continueText));
                 cancelButton.setText(getResources().getString(R.string.cancelText));
-                titleTextView.setText(getResources().getString(R.string.firstStepText));
-                subTitleTextView.setText(getResources().getString(R.string.datePickerSubTitleText));
+                titleTextView.setText(getResources().getString(R.string.datePickerSubTitleText));
                 break;
             }
             case TimeSelection: {
                 doneButton.setText(getResources().getString(R.string.continueText));
                 cancelButton.setText(getResources().getString(R.string.cancelText));
-                titleTextView.setText(getResources().getString(R.string.secondStepText));
-                subTitleTextView.setText(getResources().getString(R.string.timePickerSubTitleText));
+                titleTextView.setText(getResources().getString(R.string.timePickerSubTitleText));
                 break;
             }
             case CycleDecision: {
                 doneButton.setText(getResources().getString(R.string.yesText));
                 cancelButton.setText(getResources().getString(R.string.noText));
-                titleTextView.setText(getResources().getString(R.string.thirdStepText));
-                subTitleTextView.setText(getResources().getString(R.string.cycleAlarmDecisionSubTitleText));
+                titleTextView.setText(getResources().getString(R.string.cycleAlarmDecisionSubTitleText));
                 break;
             }
             case PeriodSelection: {
                 doneButton.setText(getResources().getString(R.string.doneText));
                 cancelButton.setText(getResources().getString(R.string.cancelText));
-                titleTextView.setText(getResources().getString(R.string.forthText));
-                subTitleTextView.setText(getResources().getString(R.string.cycleAlarmPeriodSubTitleText));
+                titleTextView.setText(getResources().getString(R.string.cycleAlarmPeriodSubTitleText));
                 break;
             }
             default: break;
@@ -185,6 +224,7 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
             case R.id.doneButton: {
                 switch (alarmStage) {
                     case DateSelection: {
+                        LogFiles.writeButtonActionLog(Enums.ActivityType.EditAlarm, Enums.ButtonActionTypes.Continue);
                         alarm.setYear(datePicker.getYear());
                         alarm.setMonth(datePicker.getMonth());
                         alarm.setDay(datePicker.getDayOfMonth());
@@ -202,6 +242,7 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
                         break;
                     }
                     case TimeSelection: {
+                        LogFiles.writeButtonActionLog(Enums.ActivityType.EditAlarm, Enums.ButtonActionTypes.Continue);
                         alarm.setHour(timePicker.getCurrentHour());
                         alarm.setMinute(timePicker.getCurrentMinute());
                         alarm.createTimeInMillis();
@@ -219,17 +260,21 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
                         break;
                     }
                     case CycleDecision: {
+                        LogFiles.writeButtonActionLog(Enums.ActivityType.EditAlarm, Enums.ButtonActionTypes.YES);
                         alarmStage = Enums.AlarmStageTypes.PeriodSelection;
                         manageComponents();
                         break;
                     }
 
                     case PeriodSelection: {
+                        LogFiles.writeButtonActionLog(Enums.ActivityType.EditAlarm, Enums.ButtonActionTypes.Done);
                         if(itemPosition != -1) {
                             alarm.setCyclePeriod(Enums.PeriodTypes.values()[itemPosition]);
                             annotation.setAlarm(alarm);
                             Toast.makeText(this, getResources().getString(R.string.createSuccessAlarmToastText), Toast.LENGTH_LONG).show();
-                            goToAnnotationActivity();
+                            if(annotation.getOperationType() == Enums.OperationType.Create){ goToAnnotationActivity(); }
+                            else { goToEditAnnotationActivity(); }
+
                         } else {
                             callMessageDialog(getResources().getString(R.string.emptyCyclePeriodErroTitleDialogText),
                                     getResources().getString(R.string.emptyCyclePeriodErroMessageDialogText),
@@ -243,11 +288,26 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
             }
             case R.id.cancelButton: {
                 if(alarmStage == Enums.AlarmStageTypes.CycleDecision) {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.EditAlarm, Enums.ButtonActionTypes.NO);
                     alarm.setCyclePeriod(Enums.PeriodTypes.None);
                     annotation.setAlarm(alarm);
                     Toast.makeText(this, getResources().getString(R.string.createSuccessAlarmToastText), Toast.LENGTH_LONG).show();
+                    if(annotation.getOperationType() == Enums.OperationType.Create){
+                        annotation.setOldAnnotation(null);
+                        goToAnnotationActivity();
+                    }
+                    else {
+                        goToEditAnnotationActivity();
+                    }
+                } else {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.EditAlarm, Enums.ButtonActionTypes.Cancel);
+                    annotation.setOldAnnotation(null);
+                    if (annotation.getOperationType() == Enums.OperationType.Create) {
+                        goToAnnotationActivity();
+                    } else {
+                        goToEditAnnotationActivity();
+                    }
                 }
-                goToAnnotationActivity();
                 break;
             }
             default:
@@ -257,7 +317,16 @@ public class EditAlarmActivity extends FragmentActivity implements MessageDialog
     }
 
     private void goToAnnotationActivity(){
+        LogFiles.writeAnnotationsLog(annotation);
         Intent intent = new Intent(getApplicationContext(), AnnotationActivity.class);
+        intent.putExtra("Annotation", annotation);
+        annotation.setOldAnnotation(annotation);
+        startActivity(intent);
+    }
+
+    private void goToEditAnnotationActivity() {
+        LogFiles.writeAnnotationsLog(annotation);
+        Intent intent = new Intent(getApplicationContext(), EditAnnotationActivity.class);
         intent.putExtra("Annotation", annotation);
         startActivity(intent);
     }

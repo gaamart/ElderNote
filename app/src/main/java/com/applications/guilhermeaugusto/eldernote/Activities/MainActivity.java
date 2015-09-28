@@ -1,5 +1,6 @@
 package com.applications.guilhermeaugusto.eldernote.Activities;
 
+import android.view.MotionEvent;
 import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.app.Dialog;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.applications.guilhermeaugusto.eldernote.ArrayAdapters.AnnotationsArrayAdapter;
 import com.applications.guilhermeaugusto.eldernote.Managers.DataBaseHandler;
+import com.applications.guilhermeaugusto.eldernote.Managers.LogFiles;
 import com.applications.guilhermeaugusto.eldernote.Managers.SoundFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Activities;
@@ -44,7 +46,34 @@ public class MainActivity extends ActionBarActivity {
         init();
         prepareListView();
         SoundFiles.removeNotUsedSoundFiles(annotationsList);
-        //showOverLay();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.Main, "Start");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.Main, "Stop");
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.Main, "BackButton");
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            LogFiles.writeTouchLog(Enums.ActivityType.Main, event.getX(), event.getY());
+        }
+
+        return super.onTouchEvent(event);
     }
 
     private void prepareListView(){
@@ -53,7 +82,9 @@ public class MainActivity extends ActionBarActivity {
         listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.Main, Enums.ButtonActionTypes.Select);
                 Annotations annotation = (Annotations) listView.getItemAtPosition(position);
+                LogFiles.writeAnnotationsLog(annotation);
                 annotation.setOperationType(Enums.OperationType.Visualize);
                 Intent intent = new Intent(getApplicationContext(), VisualizeAnnotationActivity.class);
                 intent.putExtra("Annotation", annotation);
@@ -65,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void createNewAnnotationButtonOnClick(View v) {
+        LogFiles.writeButtonActionLog(Enums.ActivityType.Main, Enums.ButtonActionTypes.CreateAnnotation);
         Intent intent = new Intent(this, AnnotationActivity.class);
         Annotations annotation = new Annotations(-1,"","","",new Activities(-1,""), new Alarms(-1, null, Enums.PeriodTypes.None));
         annotation.setOperationType(Enums.OperationType.Create);

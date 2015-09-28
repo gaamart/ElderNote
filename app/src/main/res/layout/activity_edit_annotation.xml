@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerHorizontal="true">
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/editAnnotation"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        android:gravity="center"
+        android:background="#ffd4d5d5"
+        android:layout_alignParentTop="true"/>
+
+    <LinearLayout
+        android:id="@+id/updateTypeSelectionLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        android:layout_below="@+id/titleTextView"
+        android:layout_centerHorizontal="true">
+
+        <Button
+            android:id="@+id/editAnnotationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/editAnnotationButtonText"
+            android:textSize="22sp"
+            android:onClick="onClick"
+            android:textStyle="bold"
+            android:background="@drawable/big_button"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:id="@+id/alarmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:onClick="onClick"
+            android:textStyle="bold"
+            android:background="@drawable/big_button"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:id="@+id/deleteAlarmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/deleteAlarmButtonText"
+            android:textSize="22sp"
+            android:onClick="onClick"
+            android:textStyle="bold"
+            android:background="@drawable/big_button"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/annotationUpdateCheckLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingTop="@dimen/layout_vertical_margin"
+        android:paddingBottom="@dimen/layout_vertical_margin"
+        android:layout_below="@+id/titleTextView"
+        android:layout_above="@+id/controlLayout">
+
+        <RelativeLayout
+            android:id="@+id/oldLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/newTitleTextView">
+
+            <ScrollView
+                android:id="@+id/oldScrollView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin">
+
+                <TextView
+                    android:id="@+id/oldTextView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:visibility="visible"
+                    android:background="#00000000"
+                    android:textSize="25sp"
+                    android:textIsSelectable="false"/>
+            </ScrollView>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/oldSoundLayout"
+                android:layout_centerInParent="true">
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true">
+
+                    <SeekBar
+                        android:id="@+id/oldSoundProgressSeekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"/>
+
+                    <Button android:id="@+id/oldSoundPlayingButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/startPlayButtonText"
+                        android:onClick="onClick"
+                        android:layout_gravity="center"
+                        android:textStyle="bold"
+                        android:textSize="22sp"
+                        android:background="@drawable/small_button"/>
+                </LinearLayout>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/oldAlarmLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView android:id="@+id/oldAlarmCycleDescriptionTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="25sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"/>
+
+                <TextView android:id="@+id/oldAlarmDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="25sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/newTitleTextView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/editAnnotation"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:visibility="visible"
+            android:gravity="center"
+            android:background="#ffd4d5d5"
+            android:layout_centerInParent="true"/>
+
+        <RelativeLayout
+            android:id="@+id/newLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/newTitleTextView">
+
+            <ScrollView
+                android:id="@+id/newScrollView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin">
+
+                <TextView
+                    android:id="@+id/newTextView"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:visibility="visible"
+                    android:background="#00000000"
+                    android:textSize="25sp"
+                    android:textIsSelectable="false"/>
+            </ScrollView>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/newSoundLayout"
+                android:layout_centerInParent="true">
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true">
+
+                    <SeekBar
+                        android:id="@+id/newSoundProgressSeekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"/>
+
+                    <Button android:id="@+id/newSoundPlayingButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/startPlayButtonText"
+                        android:onClick="onClick"
+                        android:layout_gravity="center"
+                        android:textStyle="bold"
+                        android:textSize="22sp"
+                        android:background="@drawable/small_button"/>
+                </LinearLayout>
+            </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/newAlarmLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView android:id="@+id/newAlarmCycleDescriptionTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="25sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"/>
+
+                <TextView android:id="@+id/newAlarmDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="25sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/controlLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/layout_vertical_margin"
+        android:paddingTop="@dimen/layout_vertical_margin"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancelText"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:onClick="onClick"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/red_small_button" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:text="@string/backText"
+            android:onClick="onClick"
+            android:background="@drawable/small_button"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/saveButtonText"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:onClick="onClick"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/green_small_button" />
+    </RelativeLayout>
+</RelativeLayout>

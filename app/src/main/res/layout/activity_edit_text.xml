@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="fill_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:text="@string/textDialogTitleText"
         android:textSize="40sp"
         android:textStyle="bold"
@@ -31,9 +31,11 @@
             android:inputType="textMultiLine"
             android:gravity="top|start"
             android:background="#00000000"
-            android:textSize="18sp"
+            android:textSize="25sp"
             android:scrollbars="vertical"
-            android:fadeScrollbars="false"/>
+            android:fadeScrollbars="false"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"/>
     </ScrollView>
     <RelativeLayout
         android:id="@+id/controllerLayout"

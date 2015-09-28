@@ -5,11 +5,11 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.view.View;
 import android.util.Log;
 import android.media.MediaPlayer;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -40,16 +40,17 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
     private SeekBar seekBar;
     private RelativeLayout writeTextLayout;
     private RelativeLayout soundRecordLayout;
-    private LinearLayout titleLayout;
     private Button soundPlayingManageButton;
     private Button createAlarmButton;
     private TextView alarmDateTextView;
     private TextView alarmCycleDescriptionTextView;
     private TextView alarmTitleTextView;
     private TextView annotationTextView;
-    private TextView titleTextView;
+    private TextView annotationTitleTextView;
+    private TextView selectionAnnotationTypeTextView;
     private Button saveButton;
     private Button cancelButton;
+    private Button singleCancelButton;
 //endregion
 
 //region ActivityMethods
@@ -60,9 +61,15 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
         dataBaseHandler = new DataBaseHandler(getApplicationContext());
         getInit();
         rulesForAddDataToComponents();
-        rulesForShowOperation();
         rulesForShowComponents();
         rulesForShowAlarm();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        pauseSoundIfNeeded();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.CreateAnnotation, "Start");
     }
 
     @Override
@@ -72,9 +79,31 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.CreateAnnotation, "Stop");
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         releaseMedia();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.CreateAnnotation, "BackButton");
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            LogFiles.writeTouchLog(Enums.ActivityType.CreateAnnotation, event.getX(), event.getY());
+        }
+
+        return super.onTouchEvent(event);
     }
 //endregion
 
@@ -91,16 +120,17 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
         seekBar = (SeekBar) findViewById(R.id.soundProgressSeekbar);
         writeTextLayout = (RelativeLayout) findViewById(R.id.writeTextLayout);
         soundRecordLayout = (RelativeLayout) findViewById(R.id.soundRecordLayout);
-        titleLayout = (LinearLayout) findViewById(R.id.titleLayout);
         soundPlayingManageButton = (Button) findViewById(R.id.soundPlayingManageButton);
         annotationTextView = (TextView) findViewById(R.id.annotationTextView);
-        titleTextView = (TextView) findViewById(R.id.titleTextView);
+        annotationTitleTextView = (TextView) findViewById(R.id.annotationTitleTextView);
+        selectionAnnotationTypeTextView = (TextView) findViewById(R.id.selectionAnnotationTypeTextView);
         createAlarmButton = (Button) findViewById(R.id.createAlarmButton);
         alarmDateTextView = (TextView) findViewById(R.id.alarmDateTextView);
         alarmCycleDescriptionTextView = (TextView) findViewById(R.id.alarmCycleDescriptionTextView);
         alarmTitleTextView = (TextView) findViewById(R.id.alarmTitleTextView);
         saveButton = (Button) findViewById(R.id.saveButton);
         cancelButton = (Button) findViewById(R.id.cancelButton);
+        singleCancelButton  = (Button) findViewById(R.id.singleCancelButton);
     }
 //endregion
 
@@ -149,38 +179,20 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
             annotationTextView.setText(currentAnnotation.getMessage());
         }
         else if(currentAnnotation.contentIsSound()){
-            titleTextView.setText(currentAnnotation.getAtivity().getTitle());
+
             contentType = Enums.ContentTypes.ShowingSound;
             prepareToPlayingSound();
             prepareSeekBar();
         }
-        else { contentType = Enums.ContentTypes.Blank; }
+        else
+        {
+            contentType = Enums.ContentTypes.Blank;
+        }
 
         if(currentAnnotation.getAlarm().getId() >= 0) { alarmType = Enums.AlarmTypes.Created; }
         else {
-            if(currentAnnotation.getAlarm().getDateInMillis() != null) { alarmType = Enums.AlarmTypes.New; }
-            else {
-                if (contentType == Enums.ContentTypes.Blank) { alarmType = Enums.AlarmTypes.Hidden; }
-                else { alarmType = Enums.AlarmTypes.Selectable; }
-            }
-        }
-    }
-
-    private void rulesForShowOperation(){
-        switch (currentAnnotation.getOperationType()){
-            case Create: {
-                setTitle(getResources().getString(R.string.createAnnotationTextView));
-                saveButton.setVisibility(View.VISIBLE);
-                cancelButton.setVisibility(View.VISIBLE);
-                break;
-            }
-            case Update: {
-                setTitle(getResources().getString(R.string.updateAnnotationTextView));
-                saveButton.setVisibility(View.VISIBLE);
-                cancelButton.setVisibility(View.VISIBLE);
-                break;
-            }
-            default: break;
+            if (contentType == Enums.ContentTypes.Blank) { alarmType = Enums.AlarmTypes.Hidden; }
+            else { alarmType = Enums.AlarmTypes.Selectable; }
         }
     }
 
@@ -193,8 +205,7 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
                 alarmCycleDescriptionTextView.setVisibility(View.INVISIBLE);
                 break;
             }
-            case Created:
-            case New: {
+            case Created:{
                 createAlarmButton.setVisibility(View.INVISIBLE);
                 alarmCycleDescriptionTextView.setText(currentAnnotation.getAlarm().createPeriodLayout(getApplicationContext()));
                 alarmDateTextView.setText(currentAnnotation.getAlarm().createDateLayout(getApplicationContext()));
@@ -217,7 +228,6 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
     private void rulesForShowComponents(){
         writeTextLayout.setVisibility(View.INVISIBLE);
         soundRecordLayout.setVisibility(View.INVISIBLE);
-        titleLayout.setVisibility(View.INVISIBLE);
 
         switch (contentType){
             case Blank: {
@@ -226,6 +236,12 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
                 annotationTextView.setVisibility(View.INVISIBLE);
                 seekBar.setVisibility(View.INVISIBLE);
                 soundPlayingManageButton.setVisibility(View.INVISIBLE);
+                saveButton.setVisibility(View.INVISIBLE);
+                cancelButton.setVisibility(View.INVISIBLE);
+                singleCancelButton.setVisibility(View.VISIBLE);
+                annotationTitleTextView.setText(getResources().getString(R.string.createAnnotationTextView));
+                selectionAnnotationTypeTextView.setVisibility(View.VISIBLE);
+
                 break;
             }
             case PlayingSound: {
@@ -233,7 +249,11 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
                 seekBar.setVisibility(View.VISIBLE);
                 soundPlayingManageButton.setVisibility(View.VISIBLE);
                 soundPlayingManageButton.setText(getResources().getString(R.string.stopPlayButtonText));
-                titleLayout.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.VISIBLE);
+                cancelButton.setVisibility(View.VISIBLE);
+                singleCancelButton.setVisibility(View.INVISIBLE);
+                annotationTitleTextView.setText(currentAnnotation.getAtivity().getTitle());
+                selectionAnnotationTypeTextView.setVisibility(View.INVISIBLE);
                 break;
             }
             case ShowingSound: {
@@ -241,14 +261,22 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
                 seekBar.setVisibility(View.VISIBLE);
                 soundPlayingManageButton.setVisibility(View.VISIBLE);
                 soundPlayingManageButton.setText(getResources().getString(R.string.startPlayButtonText));
-                titleLayout.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.VISIBLE);
+                cancelButton.setVisibility(View.VISIBLE);
+                singleCancelButton.setVisibility(View.INVISIBLE);
+                annotationTitleTextView.setText(currentAnnotation.getAtivity().getTitle());
+                selectionAnnotationTypeTextView.setVisibility(View.INVISIBLE);
                 break;
             }
             case ShowingText: {
                 annotationTextView.setVisibility(View.VISIBLE);
                 seekBar.setVisibility(View.INVISIBLE);
                 soundPlayingManageButton.setVisibility(View.INVISIBLE);
-                titleLayout.setVisibility(View.INVISIBLE);
+                saveButton.setVisibility(View.VISIBLE);
+                cancelButton.setVisibility(View.VISIBLE);
+                singleCancelButton.setVisibility(View.INVISIBLE);
+                annotationTitleTextView.setText(getResources().getString(R.string.annotationText));
+                selectionAnnotationTypeTextView.setVisibility(View.INVISIBLE);
                 break;
             }
             default: break;
@@ -260,46 +288,38 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.soundRecordLayout: {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.CreateAnnotation, Enums.ButtonActionTypes.Voice);
                 goToEditSoundActivity();
                 break;
             }
             case R.id.soundPlayingManageButton: {
                 startPlaying = !startPlaying;
                 if (startPlaying) {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.CreateAnnotation, Enums.ButtonActionTypes.Listen);
                     mediaPlayer.start();
                     contentType = Enums.ContentTypes.PlayingSound;
                 } else {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.CreateAnnotation, Enums.ButtonActionTypes.Pause);
                     mediaPlayer.pause();
                     contentType = Enums.ContentTypes.ShowingSound;
                 }
                 rulesForShowComponents();
                 break;
             }
-            //case R.id.refreshContentButton: {
-            //    if(contentType == Enums.ContentTypes.ShowingSound) {
-            //        goToEditSoundActivity();
-            //    } else {
-            //        goToEditTextActivity();
-            //    }
-            //    break;
-            //}
             case R.id.annotationTextView:
             case R.id.writeTextLayout: {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.CreateAnnotation, Enums.ButtonActionTypes.Text);
                 goToEditTextActivity();
                 break;
             }
             case R.id.createAlarmButton: {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.CreateAnnotation, Enums.ButtonActionTypes.CreateAlarm);
                 goToEditAlarmActivity();
                break;
             }
-            //case R.id.deleteAlarmButton:{
-            //    callMessageDialog(getResources().getString(R.string.deleteAlarmTitleDialogText),
-            //            getResources().getString(R.string.deleteAlarmMessageDialogText),
-            //            Enums.MessageTypes.DeleteMessage);
-            //    break;
-            //}
 
             case R.id.saveButton: {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.CreateAnnotation, Enums.ButtonActionTypes.Save);
                 if(contentType != Enums.ContentTypes.Blank){
                     pauseSoundIfNeeded();
 
@@ -307,10 +327,9 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
                         currentAnnotation.setId(dataBaseHandler.insertAnnotation(currentAnnotation));
                     } else { dataBaseHandler.updateAnnotation(currentAnnotation); }
 
-                    if(alarmType == Enums.AlarmTypes.New){
+                    if(alarmType == Enums.AlarmTypes.Created){
                         AlarmEntity.createAlarm(getApplicationContext(), currentAnnotation);
                     }
-                    LogFiles.writeAnnotationsLog(currentAnnotation);
                     Toast.makeText(this, getResources().getString(R.string.saveSuccessAnnotationToastText), Toast.LENGTH_LONG).show();
                     goToMainActivity();
                 } else {
@@ -320,8 +339,9 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
                 }
                 break;
             }
-            case R.id.okButton:
+            case R.id.singleCancelButton:
             case R.id.cancelButton: {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.CreateAnnotation, Enums.ButtonActionTypes.Cancel);
                 pauseSoundIfNeeded();
                 goToMainActivity();
                 break;
@@ -333,11 +353,7 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
 
 //region ListenerMethods
 
-    public void onMessageDialogPositiveClick(Enums.MessageTypes messageType) {
-        if(messageType == Enums.MessageTypes.DeleteMessage){
-            deleteAlarm();
-        }
-    }
+    public void onMessageDialogPositiveClick(Enums.MessageTypes messageType) { }
 
     public void onMessageDialogNegativeClick(Enums.MessageTypes messageType){
         if(messageType == Enums.MessageTypes.DecisionMessage) {
@@ -376,6 +392,7 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
 
     private void goToMainActivity(){
         releaseMedia();
+        LogFiles.writeAnnotationsLog(currentAnnotation);
         currentAnnotation = null;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
@@ -407,17 +424,6 @@ public class AnnotationActivity extends FragmentActivity implements MessageDialo
         dialogFragment = new MessageDialogFragment();
         dialogFragment.setArguments(messageBundle);
         dialogFragment.show(getSupportFragmentManager(), "message_dialog");
-    }
-//endregion
-
-//region deleteMethods
-    private void deleteAlarm(){
-        alarmType = Enums.AlarmTypes.Selectable;
-        rulesForShowAlarm();
-        AlarmEntity.removeAlarm(getApplicationContext(), currentAnnotation.getAlarm().getId());
-        currentAnnotation.getAlarm().setId(-1);
-        currentAnnotation.getAlarm().setDateInMillis(null);
-        currentAnnotation.getAlarm().setCyclePeriod(Enums.PeriodTypes.None);
     }
 //endregion
 }

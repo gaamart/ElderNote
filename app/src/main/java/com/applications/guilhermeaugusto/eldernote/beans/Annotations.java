@@ -15,6 +15,7 @@ public class Annotations implements Serializable {
     private Activities activity;
     private Alarms alarm;
     private Enums.OperationType operationType;
+    private Annotations oldAnnotation;
 
     public Annotations(long id,
                        String message,
@@ -28,6 +29,7 @@ public class Annotations implements Serializable {
         this.soundDuration = soundDuration;
         this.activity = activity;
         this.alarm = alarm;
+        this.oldAnnotation = null;
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws IOException {
@@ -38,6 +40,7 @@ public class Annotations implements Serializable {
         out.writeObject(activity);
         out.writeObject(alarm);
         out.writeObject(operationType);
+        out.writeObject(oldAnnotation);
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -49,6 +52,7 @@ public class Annotations implements Serializable {
         activity = (Activities) in.readObject();
         alarm = (Alarms) in.readObject();
         operationType = (Enums.OperationType) in.readObject();
+        oldAnnotation = (Annotations) in.readObject();
     }
 
     public boolean contentIsText(){
@@ -58,6 +62,8 @@ public class Annotations implements Serializable {
     public boolean contentIsSound(){
         return this.sound != null && !this.sound.isEmpty();
     }
+
+    public boolean hasAlarm() { return this.getAlarm().getId() >= 0; }
 
     public long getId(){
         return this.id;
@@ -72,6 +78,7 @@ public class Annotations implements Serializable {
     }
     public Alarms getAlarm(){ return this.alarm; }
     public Enums.OperationType getOperationType(){ return this.operationType; }
+    public Annotations getOldAnnotation() { return this.oldAnnotation; }
 
     public void setId(long id){ this.id = id; }
     public void setMessage(String message){ this.message = message; }
@@ -84,4 +91,5 @@ public class Annotations implements Serializable {
     public void setActivity(Activities activity){ this.activity = activity; }
     public void setAlarm(Alarms alarm){ this.alarm = alarm; }
     public void setOperationType(Enums.OperationType operationType){ this.operationType = operationType; }
+    public void setOldAnnotation(Annotations oldAnnotation){ this.oldAnnotation = oldAnnotation; }
 }

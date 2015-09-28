@@ -43,19 +43,22 @@ public abstract class LogFiles {
 
     public static void writeAnnotationsLog(Annotations annotation) {
         try {
-            File file = new File(createFile(), "annotations_log.txt");
+            File file = new File(createFile(), "master_log.txt");
             FileOutputStream fileOutputStream = new FileOutputStream(file, true);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
             String log;
             if(annotation.contentIsText()) {
                 log = getCurrentDate() + " ;" +
                         Long.toString(annotation.getId()) + " ; " +
-                        Integer.toString(annotation.getAlarm().getCyclePeriod().ordinal()) + " ; " +
+                        Long.toString(annotation.getMessage().length()) + " ; " +
+                        annotation.getAlarm().getCyclePeriod().name() + " ; " +
+                        annotation.getAlarm().getDateInMillis() + " ; " +
                         "texto " + "\n";
             } else {
                 log = getCurrentDate() + " ;" +
                         Long.toString(annotation.getId()) + " ; " +
-                        Integer.toString(annotation.getAlarm().getCyclePeriod().ordinal()) + " ; " +
+                        annotation.getAlarm().getCyclePeriod().name() + " ; " +
+                        annotation.getAlarm().getDateInMillis() + " ; " +
                         annotation.getAtivity().getTitle() + " ; " +
                         Long.toString(TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(annotation.getSoundDuration()))) + " ; " +
                         "audio" + "\n";
@@ -68,30 +71,58 @@ public abstract class LogFiles {
         }
     }
 
-    public static void writeBackActionLog(Enums.BackActionTypes backActionTypes) {
+    public static void writeTouchLog(Enums.ActivityType activityType, float x, float y) {
         try {
-            File file = new File(createFile(), "back_action_log.txt");
+            File file = new File(createFile(), "master_log.txt");
             FileOutputStream fileOutputStream = new FileOutputStream(file, true);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
             String log;
-            switch (backActionTypes){
-                case Upper: {
-                    log = getCurrentDate() + " ;" + "Botao back da action bar pressionado"  + "\n";
-                    break;
-                }
-                case Bottom: {
-                    log = getCurrentDate() + " ;" + "Botao back do android pressionado"  + "\n";
-                    break;
-                }
-                case ByButton: {
-                    log = getCurrentDate() + " ;" + "Botao voltar do aplicativo pressionado"  + "\n";
-                    break;
-                }
-                default: {
-                    log = getCurrentDate() + " ;" + "Aconteceu um erro"  + "\n";
-                    break;
-                }
-            }
+            log = getCurrentDate() + " ;" + activityType.name() + " ; x= " + Float.toString(x) + " ; y= " + Float.toString(y) + "\n";
+            outputStreamWriter.write(log);
+            outputStreamWriter.close();
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public static void writeButtonActionLog(Enums.ActivityType activityType, Enums.ButtonActionTypes buttonActionTypes) {
+        try {
+            File file = new File(createFile(), "master_log.txt");
+            FileOutputStream fileOutputStream = new FileOutputStream(file, true);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+            String log;
+            log = getCurrentDate() + " ;" + activityType.name() + " ; " + buttonActionTypes.name() + "\n";
+            outputStreamWriter.write(log);
+            outputStreamWriter.close();
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public static void writeActivityEventsLog(Enums.ActivityType activityType, String event) {
+        try {
+            File file = new File(createFile(), "master_log.txt");
+            FileOutputStream fileOutputStream = new FileOutputStream(file, true);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+            String log;
+            log = getCurrentDate() + " ;" + activityType.name() + " ; " + event + "\n";
+            outputStreamWriter.write(log);
+            outputStreamWriter.close();
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
+    }
+
+    public static void writeAlarmTriggerLog(Enums.TriggerType triggerType) {
+        try {
+            File file = new File(createFile(), "master_log.txt");
+            FileOutputStream fileOutputStream = new FileOutputStream(file, true);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+            String log;
+            log = getCurrentDate() + " ;" + triggerType.name() + "\n";
             outputStreamWriter.write(log);
             outputStreamWriter.close();
             fileOutputStream.close();

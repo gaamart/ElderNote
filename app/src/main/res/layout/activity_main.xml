@@ -32,15 +32,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_below="@+id/controlsLayout">
+
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="40dip"
-            android:gravity="center_vertical|center_horizontal"
-            android:textSize="24sp"
-            android:background="#ffdeddde"
             android:id="@+id/annotationsListTextView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:text="@string/annotationsListTextViewText"
-            android:textStyle="bold" />
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:visibility="visible"
+            android:gravity="center"
+            android:background="#ffd4d5d5" />
 
         <ListView
             android:id="@+id/annotationsListView"

@@ -26,6 +26,7 @@ import simplesound.pcm.WavAudioFormat;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
+import android.util.Log;
 
 import com.skd.androidrecording.fft.Complex;
 import com.skd.androidrecording.fft.FFT;
@@ -38,10 +39,12 @@ import com.skd.androidrecording.fft.FFT;
 
 public class AudioRecordingThread extends Thread {
 	private static final String FILE_NAME = "audiorecordtest.raw";
+    private static final String TAG = "AudioRecordingThread";
 	private static final int SAMPLING_RATE = 44100;
 	private static final int FFT_POINTS  = 256;
 	private static final int MAGIC_SCALE = 100;
-	
+    private static int[] mSampleRates = new int[] { 44100 };
+
 	private String fileName_wav;
     private String fileName_raw;
     
@@ -51,7 +54,7 @@ public class AudioRecordingThread extends Thread {
     private boolean isRecording = true;
 
     private AudioRecordingHandler handler = null;
-    
+
     public AudioRecordingThread(String fileWavName, AudioRecordingHandler handler) {
     	this.fileName_wav = fileWavName;
     	this.fileName_raw = getRawName(fileWavName);
@@ -73,6 +76,7 @@ public class AudioRecordingThread extends Thread {
 							    			 AudioFormat.CHANNEL_IN_MONO,
 							    			 AudioFormat.ENCODING_PCM_16BIT,
 							    			 bufferSize);
+
 	    record.startRecording();
 	
 	    int read = 0;
@@ -190,6 +194,29 @@ public class AudioRecordingThread extends Thread {
 				handler.onRecordSaveError();
 			}
 		}
+    }
+
+    public AudioRecord findAudioRecord() {
+        for (int rate : mSampleRates) {
+            for (short audioFormat : new short[] { AudioFormat.ENCODING_PCM_16BIT }) {
+                for (short channelConfig : new short[] { AudioFormat.CHANNEL_IN_MONO}) {
+                    try {
+
+                        bufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+
+                        if (bufferSize != AudioRecord.ERROR_BAD_VALUE) {
+                            AudioRecord recorder = new AudioRecord(AudioSource.DEFAULT, rate, channelConfig, audioFormat, bufferSize);
+
+                            if (recorder.getState() == AudioRecord.STATE_INITIALIZED)
+                                return recorder;
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, rate + "Exception, keep trying.",e);
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     public synchronized void stopRecording() {

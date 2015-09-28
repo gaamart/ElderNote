@@ -13,6 +13,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import com.applications.guilhermeaugusto.eldernote.Activities.AnnotationActivity;
+import com.applications.guilhermeaugusto.eldernote.Activities.VisualizeAnnotationActivity;
 import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Annotations;
 import com.applications.guilhermeaugusto.eldernote.beans.Enums;
@@ -44,37 +45,38 @@ public class BootReceiver extends BroadcastReceiver
                         Long periodInMillis = annotation.getAlarm().createCycleTimeInMillis();
                         annotation.getAlarm().setDateInMillis(Long.toString(dateInMillis + periodInMillis));
                         if (System.currentTimeMillis() > Long.parseLong(annotation.getAlarm().getDateInMillis())) {
+                            dataBaseHandler.updateAnnotation(annotation);
                             createNotification(context, annotation);
                             callNotificationRingtone(context);
                         }
                     }
+                    AlarmEntity.createAlarm(context, annotation);
                 }
-                dataBaseHandler.updateAnnotation(annotation);
-                AlarmEntity.createAlarm(context, annotation);
             }
         }
     }
 
     private void createNotification(Context context, Annotations annotation){
+        LogFiles.writeAlarmTriggerLog(Enums.TriggerType.Notification);
         NotificationCompat.Builder mBuilder;
 
         if(annotation.contentIsText()){
             mBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.eldernote)
                     .setContentTitle(annotation.getMessage())
-                    .setContentText(annotation.getAlarm().createDateLayout(context));
+                    .setContentText(annotation.getAlarm().createMissDateLayout(context));
         } else {
             mBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.eldernote)
                     .setContentTitle(annotation.getAtivity().getTitle())
-                    .setContentText(annotation.getAlarm().createDateLayout(context));
+                    .setContentText(annotation.getAlarm().createMissDateLayout(context));
         }
-        Intent activityIntent = new Intent(context, AnnotationActivity.class);
+        Intent activityIntent = new Intent(context, VisualizeAnnotationActivity.class);
         annotation.setOperationType(Enums.OperationType.Visualize);
         activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activityIntent.putExtra("Annotation", annotation);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(AnnotationActivity.class);
+        stackBuilder.addParentStack(VisualizeAnnotationActivity.class);
         stackBuilder.addNextIntent(activityIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);

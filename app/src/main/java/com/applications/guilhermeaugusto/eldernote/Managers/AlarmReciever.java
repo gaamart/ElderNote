@@ -16,6 +16,7 @@ public class AlarmReciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent)
     {
+        LogFiles.writeAlarmTriggerLog(Enums.TriggerType.Active);
         DataBaseHandler dataBaseHandler = new DataBaseHandler(context);
         Intent activityIntent = new Intent(context, VisualizeAnnotationActivity.class);
         Annotations annotation = dataBaseHandler.selectAnnotation(intent.getLongExtra("Annotation_ID", 0));

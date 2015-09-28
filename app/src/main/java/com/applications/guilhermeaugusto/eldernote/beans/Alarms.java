@@ -95,6 +95,19 @@ public class Alarms implements  Serializable {
         } else return null;
     }
 
+    public String createMissDateLayout(Context context) {
+        String dateFormat;
+
+        if (this.dateInMillis != null) {
+            GregorianCalendar gregorianCalendar = new GregorianCalendar();
+            gregorianCalendar.setTimeInMillis(Long.parseLong(this.dateInMillis));
+            dateFormat = createDateFormat(context);
+
+            return context.getResources().getString(R.string.missAlarmDateText) +
+                    dateFormat;
+        } else return null;
+    }
+
     public String createDateFormat(Context context){
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTimeInMillis(Long.parseLong(this.dateInMillis));

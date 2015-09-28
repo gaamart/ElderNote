@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -13,10 +14,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applications.guilhermeaugusto.eldernote.ArrayAdapters.BasicArrayAdapter;
 import com.applications.guilhermeaugusto.eldernote.Dialogs.MessageDialogFragment;
 import com.applications.guilhermeaugusto.eldernote.Managers.DataBaseHandler;
+import com.applications.guilhermeaugusto.eldernote.Managers.LogFiles;
 import com.applications.guilhermeaugusto.eldernote.Managers.SoundFiles;
 import com.applications.guilhermeaugusto.eldernote.R;
 import com.applications.guilhermeaugusto.eldernote.beans.Activities;
@@ -51,12 +54,30 @@ public class EditSoundActivity extends FragmentActivity implements MessageDialog
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_sound);
         annotation = (Annotations) getIntent().getSerializableExtra("Annotation");
+        Annotations oldAnnotation = new Annotations(annotation.getId(),
+                annotation.getMessage(),
+                annotation.getSound(),
+                annotation.getSoundDuration(),
+                annotation.getAtivity(),
+                annotation.getAlarm());
+        annotation.setOldAnnotation(oldAnnotation);
         init();
         showComponents();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.EditSound, "Stop");
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.EditSound, "BackButton");
     }
 
     @Override
@@ -66,6 +87,7 @@ public class EditSoundActivity extends FragmentActivity implements MessageDialog
         prepareVisualizer();
         prepareListView();
         startRecording();
+        LogFiles.writeActivityEventsLog(Enums.ActivityType.EditSound, "Start");
     }
 
     @Override
@@ -74,8 +96,19 @@ public class EditSoundActivity extends FragmentActivity implements MessageDialog
         if(!userFinish) {
             stopRecording();
             SoundFiles.removeOutputFile(soundPath);
-            goToAnnotationActivity();
+            if(annotation.getOperationType() == Enums.OperationType.Create){ goToAnnotationActivity(); }
+            else { goToEditAnnotationActivity(); }
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            LogFiles.writeTouchLog(Enums.ActivityType.EditSound, event.getX(), event.getY());
+        }
+
+        return super.onTouchEvent(event);
     }
 
     private void init() {
@@ -91,14 +124,17 @@ public class EditSoundActivity extends FragmentActivity implements MessageDialog
         switch (view.getId()) {
             case R.id.doneButton: {
                 if (!userSpoke) {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.EditSound, Enums.ButtonActionTypes.Stop);
                     userSpoke = true;
                     stopRecording();
                     showComponents();
                 } else {
+                    LogFiles.writeButtonActionLog(Enums.ActivityType.EditSound, Enums.ButtonActionTypes.Done);
                     if (itemPosition != -1) {
                         annotation.setActivity(activities.get(itemPosition));
                         annotation.setSound(soundPath);
-                        goToAnnotationActivity();
+                        if(annotation.getOperationType() == Enums.OperationType.Create){ goToAnnotationActivity(); }
+                        else { goToEditAnnotationActivity(); }
                     } else {
                         callMessageDialog(getResources().getString(R.string.emptyDescriptionErroTitleDialogText),
                                 getResources().getString(R.string.emptyDescriptionErroMessageDialogText),
@@ -108,9 +144,12 @@ public class EditSoundActivity extends FragmentActivity implements MessageDialog
                 break;
             }
             case R.id.cancelButton: {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.EditSound, Enums.ButtonActionTypes.Cancel);
                 stopRecording();
                 SoundFiles.removeOutputFile(soundPath);
-                goToAnnotationActivity();
+                annotation.setOldAnnotation(null);
+                if(annotation.getOperationType() == Enums.OperationType.Create){ goToAnnotationActivity(); }
+                else { goToEditAnnotationActivity(); }
                 break;
             }
             default:
@@ -147,6 +186,7 @@ public class EditSoundActivity extends FragmentActivity implements MessageDialog
         listView.setOnItemClickListener (new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LogFiles.writeButtonActionLog(Enums.ActivityType.EditSound, Enums.ButtonActionTypes.Select);
                 itemPosition = position;
                 adapter.setSelectedItem(position);
             }
@@ -205,7 +245,17 @@ public class EditSoundActivity extends FragmentActivity implements MessageDialog
 
     private void goToAnnotationActivity(){
         userFinish = true;
+        LogFiles.writeAnnotationsLog(annotation);
+        annotation.setOldAnnotation(null);
         Intent intent = new Intent(getApplicationContext(), AnnotationActivity.class);
+        intent.putExtra("Annotation", annotation);
+        startActivity(intent);
+    }
+
+    private void goToEditAnnotationActivity() {
+        userFinish = true;
+        LogFiles.writeAnnotationsLog(annotation);
+        Intent intent = new Intent(getApplicationContext(), EditAnnotationActivity.class);
         intent.putExtra("Annotation", annotation);
         startActivity(intent);
     }
